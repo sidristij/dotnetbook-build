@@ -6,3 +6,7 @@
   - MS Word / Open/LibreOffice
   - PDF
   - форматы читалок
+
+Дополнительно:
+
+  - Side by side view для текстов на разных языках
