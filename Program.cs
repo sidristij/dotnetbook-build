@@ -15,13 +15,13 @@ namespace BookBuilder
         private static string mdExt = ".md";
         private static string targetExt = ".html";
         
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             var tasks = new ConcurrentQueue<Task>();
             
             // Parse and enqueue tasks
             Parser.Default.ParseArguments<Options>(args)
-                .WithParsed<Options>(o =>
+                .WithParsed(o =>
                 {
                     if (Directory.Exists(o.Path))
                     {
@@ -57,14 +57,21 @@ namespace BookBuilder
                 }
                 else
                 {
-                    await ProcessNonMarkdownFileAsync();
+                    await ProcessNonMarkdownFileAsync(opts.Combine(filePath, false));
                 }
             }
         }
 
-        private static async Task ProcessNonMarkdownFileAsync()
+        private static async Task ProcessNonMarkdownFileAsync(ProcessingOptions opts)
         {
-            
+            var folderTargetPath = Path.GetDirectoryName(opts.TargetPath);
+            if (!Directory.Exists(folderTargetPath)) Directory.CreateDirectory(folderTargetPath);
+
+            await Task.Run(() =>
+            {
+                if(File.Exists(opts.TargetPath)) File.Delete(opts.TargetPath);
+                File.Copy(opts.SourcePath, opts.TargetPath);
+            });
         }
 
         private static async Task StartProcessing(ProcessingOptions opts)
@@ -74,13 +81,14 @@ namespace BookBuilder
             var pipeline = new MarkdownPipelineBuilder()
                 .UseAdvancedExtensions()
                 .UseSyntaxHighlighting()
+                .UseMarkdownLocalLinksPatchingExtension(opts)
                 .Build();
 
             var renderer = new HtmlRenderer(writer);
             pipeline.Setup(renderer);
 
             renderer.Writer = writer;
-            renderer.Render(Markdown.Parse(File.ReadAllText(opts.SourcePath)));
+            renderer.Render(Markdown.Parse(File.ReadAllText(opts.SourcePath), pipeline));
 
             await renderer.Writer.FlushAsync();
         }
@@ -113,15 +121,5 @@ namespace BookBuilder
                 Console.WriteLine($"Given path isn't exists (\"{options.SourcePath}\")");
             }
         }
-    }
-
-    public class ProcessingChain
-    {
-        
-    }
-
-    public class ProcessingItem
-    {
-        
     }
 }

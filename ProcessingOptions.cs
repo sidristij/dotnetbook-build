@@ -46,7 +46,7 @@ namespace BookBuilder
                 SourceRootPath = SourceRootPath,
                 TargetPath = relative_target,
                 TargetRootPath = TargetRootPath,
-                TargetExt = IsFolder ? TargetExt : string.Empty,
+                TargetExt = TargetExt,
                 IsFolder = isFolder
             };
         }

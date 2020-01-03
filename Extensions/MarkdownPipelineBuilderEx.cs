@@ -2,13 +2,12 @@ using Markdig;
 
 namespace BookBuilder
 {
-    public static class MarkdownPipelineBuilderEx
+    internal static class MarkdownPipelineBuilderEx
     {
-        public static MarkdownPipelineBuilder UsePodcastPlacementExtension(this MarkdownPipelineBuilder builder)
+        public static MarkdownPipelineBuilder UseMarkdownLocalLinksPatchingExtension(this MarkdownPipelineBuilder builder, ProcessingOptions opts)
         {
-            var extension = new PipelineBuilderExtension();
-            extension.Setup(builder);
-            builder.Extensions.AddIfNotAlready(extension);
+            var ex = new MarkdownLocalLinksPatchingExtension(opts);
+            builder.Extensions.AddIfNotAlready(ex);
             return builder;
         }
     }
