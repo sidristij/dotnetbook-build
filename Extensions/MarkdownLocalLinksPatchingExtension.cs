@@ -1,13 +1,9 @@
-using System;
-using System.IO;
-using System.Linq;
 using Markdig;
 using Markdig.Renderers;
 using Markdig.Renderers.Html.Inlines;
-using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
-namespace BookBuilder
+namespace BookBuilder.Extensions
 {
     internal class MarkdownLocalLinksPatchingExtension : IMarkdownExtension
     {

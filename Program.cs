@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using BookBuilder.Extensions;
 using CommandLine;
 using Markdig;
 using Markdig.Renderers;
@@ -45,7 +46,7 @@ namespace BookBuilder
             foreach (var subfolder in subfolders)
             {
                 var po = opts.Combine(subfolder);
-                Console.WriteLine($"Found local subfolder: ({po.SourcePath}) -> ({po.TargetPath})");
+                // Console.WriteLine($"Found local subfolder: ({po.SourcePath}) -> ({po.TargetPath})");
                 await ProcessFolderAsync(po);
             }
 
@@ -82,6 +83,8 @@ namespace BookBuilder
                 .UseAdvancedExtensions()
                 .UseSyntaxHighlighting()
                 .UseMarkdownLocalLinksPatchingExtension(opts)
+                .UsePodcastFrameSupport(new PodcastSupportOptions{Width = "400px", Height = "102px"})
+                
                 .Build();
 
             var renderer = new HtmlRenderer(writer);
@@ -97,7 +100,7 @@ namespace BookBuilder
         {
             if (!string.IsNullOrWhiteSpace(options.SourcePath) && File.Exists(options.SourcePath))
             {
-                Console.WriteLine($"Staring processing of md file: ({options.SourcePath}) -> ({options.TargetPath})");
+                // Console.WriteLine($"Staring processing of md file: ({options.SourcePath}) -> ({options.TargetPath})");
                 var folderTargetPath = Path.GetDirectoryName(options.TargetPath);
                 if (!Directory.Exists(folderTargetPath)) Directory.CreateDirectory(folderTargetPath);
                 try
