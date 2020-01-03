@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace bookbuild
+namespace BookBuilder
 {
     internal class Options
     {
