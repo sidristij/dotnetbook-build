@@ -9,19 +9,20 @@ using Markdig.Syntax.Inlines;
 
 namespace BookBuilder.Extensions
 {
+    /// <summary>
+    /// Осуществляет подстановку плеера подкаста книги
+    /// </summary>
     internal class PodcastSupportExtension : IMarkdownExtension
     {
-        private string _width = "400px";
-        private string _height = "102px";
-        private string _class = null;
-        
+        private readonly PodcastSupportOptions _opts;
         public PodcastSupportExtension(PodcastSupportOptions opts = null)
         {
-            if (opts != null)
+            _opts = opts ?? new PodcastSupportOptions
             {
-                _width = opts.Width;
-                _height = opts.Height;
-            }
+                Width = "400px",
+                Height = "102px",
+                Class = null
+            };
         }
         
         public void Setup(MarkdownPipelineBuilder pipeline)
@@ -30,8 +31,7 @@ namespace BookBuilder.Extensions
 
         public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
         {
-            var htmlRenderer = renderer as HtmlRenderer;
-            if (htmlRenderer != null)
+            if (renderer is HtmlRenderer htmlRenderer)
             {
                 var inlineRenderer = htmlRenderer.ObjectRenderers.FindExact<LinkInlineRenderer>();
                 if (inlineRenderer != null)
@@ -49,9 +49,8 @@ namespace BookBuilder.Extensions
                 return false;
             }
 
-            Uri uri;
             // Only process absolute Uri
-            if (!Uri.TryCreate(linkInline.Url, UriKind.RelativeOrAbsolute, out uri) || !uri.IsAbsoluteUri)
+            if (!Uri.TryCreate(linkInline.Url, UriKind.RelativeOrAbsolute, out var uri) || !uri.IsAbsoluteUri)
             {
                 return false;
             }
@@ -118,14 +117,14 @@ namespace BookBuilder.Extensions
             renderer.WriteEscapeUrl(foundProvider.Result);
             renderer.Write("\"");
 
-            if(_width != null)
-                htmlAttributes.AddPropertyIfNotExist("width", _width);
+            if(_opts.Width != null)
+                htmlAttributes.AddPropertyIfNotExist("width", _opts.Width);
 
-            if (_height != null)
-                htmlAttributes.AddPropertyIfNotExist("height", _height);
+            if (_opts.Height != null)
+                htmlAttributes.AddPropertyIfNotExist("height", _opts.Height);
 
-            if (!string.IsNullOrEmpty(_class))
-                htmlAttributes.AddPropertyIfNotExist("class", _class);
+            if (!string.IsNullOrEmpty(_opts.Class))
+                htmlAttributes.AddPropertyIfNotExist("class", _opts.Class);
 
             htmlAttributes.AddPropertyIfNotExist("frameborder", "0");
             renderer.WriteAttributes(htmlAttributes);
@@ -133,20 +132,5 @@ namespace BookBuilder.Extensions
 
             return true;
         }
-
-        private static readonly string[] SplitAnd = {"&"};
-        private static string[] SplitQuery(Uri uri)
-        {
-            var query = uri.Query.Substring(uri.Query.IndexOf('?') + 1);
-            return query.Split(SplitAnd, StringSplitOptions.RemoveEmptyEntries);
-        }
-    }
-
-    internal class PodcastSupportOptions
-    {
-        public string Width { get; set; }
-        public string Height { get; set; }
-        
-        public string Class { get; set; }
     }
 }

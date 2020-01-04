@@ -10,3 +10,6 @@
 Дополнительно:
 
   - Side by side view для текстов на разных языках
+
+
+[https://meduza.io/feature/2017/01/29/kak-vybrat-shrift](https://meduza.io/feature/2017/01/29/kak-vybrat-shrift)
