@@ -84,7 +84,6 @@ namespace BookBuilder
                 .UseSyntaxHighlighting()
                 .UseMarkdownLocalLinksPatchingExtension(opts)
                 .UsePodcastFrameSupport(new PodcastSupportOptions{Width = "400px", Height = "102px"})
-                
                 .Build();
 
             var renderer = new HtmlRenderer(writer);

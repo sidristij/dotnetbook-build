@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'PF Regal Text Pro';
+    src: local('PF Regal Text Pro RegularA'), local('PF-Regal-Text-Pro-RegularA'),
+        url('PFRegalTextPro-RegularA.woff2') format('woff2'),
+        url('PFRegalTextPro-RegularA.woff') format('woff'),
+        url('PFRegalTextPro-RegularA.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
