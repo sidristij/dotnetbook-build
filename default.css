@@ -1,4 +1,4 @@
-p,li {
+p, li {
     margin: 0 0 14px;
     font-family: PF Regal,PF Regal Text Pro,Georgia,serif;
     font-size: 18px;
@@ -6,7 +6,7 @@ p,li {
 }
 
 p code {
-    font-family: consolas;
+    font-family: consolas, monospace;
     font-size: 17px;
     background-color: aliceblue;
     padding: 4px 6px;
@@ -19,7 +19,7 @@ p a {
 }
 
 blockquote p {
-    margin: 16px 0px;
+    margin: 16px 0;
     padding: 12px 12px 13px;
     border: 1px solid rgba(0,0,0,.08);
     border-radius: 8px;
@@ -31,7 +31,7 @@ blockquote p {
 }
 
 blockquote p code {
-    font-family: consolas;
+    font-family: consolas, monospace;
     font-size: 17px;
     background-color: aliceblue;
     padding: 4px 6px;
@@ -50,10 +50,8 @@ h1 {
 }
 
 h1 b {
-    margin: 0 0 18px;
     font-family: Proxima Nova,Arial,Helvetica Neue,sans-serif;
     font-weight: 700;
-    margin-bottom: 15px;
     font-size: 37px;
     line-height: 42px;
 }

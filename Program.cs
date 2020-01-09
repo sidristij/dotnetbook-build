@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using BookBuilder.Extensions;
+using BookBuilder.Pipeline.Common;
 using CommandLine;
 using Markdig;
 using Markdig.Renderers;
@@ -15,9 +16,11 @@ namespace BookBuilder
     {
         private static string mdExt = ".md";
         private static string targetExt = ".html";
+        private static ProjectProcessing _processing;
         
         static void Main(string[] args)
         {
+            _processing = new ProjectProcessing();
             var tasks = new ConcurrentQueue<Task>();
             
             // Parse and enqueue tasks
@@ -77,8 +80,6 @@ namespace BookBuilder
 
         private static async Task StartProcessing(ProcessingOptions opts)
         {
-            await using var writer = new StreamWriter(opts.TargetPath, false, Encoding.UTF8);
-
             var pipeline = new MarkdownPipelineBuilder()
                 .UseAdvancedExtensions()
                 .UseSyntaxHighlighting()
@@ -86,11 +87,14 @@ namespace BookBuilder
                 .UsePodcastFrameSupport(new PodcastSupportOptions{Width = "400px", Height = "102px"})
                 .Build();
 
+            var document = Markdown.Parse(File.ReadAllText(opts.SourcePath), pipeline);
+            
+            await using var writer = new StreamWriter(opts.TargetPath, false, Encoding.UTF8);
+
             var renderer = new HtmlRenderer(writer);
             pipeline.Setup(renderer);
-
             renderer.Writer = writer;
-            renderer.Render(Markdown.Parse(File.ReadAllText(opts.SourcePath), pipeline));
+            renderer.Render(document);
 
             await renderer.Writer.FlushAsync();
         }
@@ -99,7 +103,6 @@ namespace BookBuilder
         {
             if (!string.IsNullOrWhiteSpace(options.SourcePath) && File.Exists(options.SourcePath))
             {
-                // Console.WriteLine($"Staring processing of md file: ({options.SourcePath}) -> ({options.TargetPath})");
                 var folderTargetPath = Path.GetDirectoryName(options.TargetPath);
                 if (!Directory.Exists(folderTargetPath)) Directory.CreateDirectory(folderTargetPath);
                 try
@@ -108,14 +111,7 @@ namespace BookBuilder
                 }
                 catch (Exception ex)
                 {
-                    // if (!string.IsNullOrEmpty(options.ErrorLogs))
-                    // {
-                    //     // log to ilogger
-                    // }
-                    // else
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                    Console.WriteLine(ex.Message);
                 }
             }
             else
