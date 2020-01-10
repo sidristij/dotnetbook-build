@@ -16,6 +16,8 @@ namespace BookBuilder.Pipeline.Common
 
         public abstract ProcessingStage MyStage { get; }
         
+        public virtual bool ShouldWorkInExclusiveMode => false;
+
         public abstract Task DoWorkAsync();
     }
 }

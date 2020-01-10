@@ -11,11 +11,11 @@ namespace BookBuilder.Pipeline.Common
         private Dictionary<ProcessingStage, ConcurrentQueue<IProcessingItem>> _queue;
 
         private ProcessingStage Stage { get; set; }
-        
+
         public ProjectProcessing()
         {
             _queue = new Dictionary<ProcessingStage, ConcurrentQueue<IProcessingItem>>();
-            foreach (var (processingStage, _) in ProcessingStageEx.Enumerate())
+            foreach (var processingStage in ProcessingStageEx.Enumerate())
             {
                 _queue[processingStage] = new ConcurrentQueue<IProcessingItem>();
             }
@@ -35,8 +35,9 @@ namespace BookBuilder.Pipeline.Common
         {
             var tasks = new List<Task>(128);
             var pair = new ConcurrentExclusiveSchedulerPair(TaskScheduler.Current);
-            foreach (var (stage, nonConcurrent) in ProcessingStageEx.Enumerate())
+            foreach (var stage in ProcessingStageEx.Enumerate())
             {
+                Stage = stage;
                 bool tasksGot;
                 do
                 {
@@ -58,7 +59,7 @@ namespace BookBuilder.Pipeline.Common
                         }, 
                         CancellationToken.None, 
                         TaskCreationOptions.None, 
-                        nonConcurrent ? pair.ExclusiveScheduler : pair.ConcurrentScheduler));
+                        task.ShouldWorkInExclusiveMode ? pair.ExclusiveScheduler : pair.ConcurrentScheduler));
                         
                         tasksGot = true;
                     }

@@ -12,12 +12,17 @@ namespace BookBuilder.Pipeline
 {
     internal class MarkdownFileProcessor : ProcessingItemBase
     {
-        protected ProcessingOptions Options { get; }
+        protected ProcessingOptions Options => Context.Get<ProcessingOptions>();
 
         public MarkdownFileProcessor(Context context) : base(context)
         {
-            Options = Context.Get<ProcessingOptions>();
         }
+        
+        /// <summary>
+        /// Cannot work in parallel with other MarkdownFileProcessors because
+        /// dependant MarkdownParser isn't thread-safe
+        /// </summary>
+        public override bool ShouldWorkInExclusiveMode => true;
 
         public override ProcessingStage MyStage => ProcessingStage.ParsableFilesProcessing;
         public override async Task DoWorkAsync()

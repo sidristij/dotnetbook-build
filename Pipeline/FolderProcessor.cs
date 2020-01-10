@@ -5,16 +5,19 @@ using BookBuilder.Pipeline.Common;
 
 namespace BookBuilder.Pipeline
 {
+    /// <summary>
+    /// Depending on file type redirects file processing to md parser or to resources
+    /// copying task 
+    /// </summary>
     internal class FolderProcessor : ProcessingItemBase
     {
         private static string mdExt = ".md";
         private static string targetExt = ".html";
 
-        protected ProcessingOptions Opts { get; }
+        protected ProcessingOptions Opts => Context.Get<ProcessingOptions>();
 
         public FolderProcessor(Context context) : base(context)
         {
-            Opts = Context.Get<ProcessingOptions>();
         }
 
         public override ProcessingStage MyStage  => ProcessingStage.FoldersProcessing;

@@ -6,11 +6,10 @@ namespace BookBuilder.Pipeline
 {
     internal class ResourceFileProcessor : ProcessingItemBase
     {
-        protected ProcessingOptions Options { get; }
+        protected ProcessingOptions Options => Context.Get<ProcessingOptions>();
 
         public ResourceFileProcessor(Context context) : base(context)
         {
-            Options = Context.Get<ProcessingOptions>();
         }
         
         public override ProcessingStage MyStage => ProcessingStage.NonParsableFilesProcessing;
