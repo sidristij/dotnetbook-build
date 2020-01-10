@@ -10,5 +10,6 @@ namespace BookBuilder.Pipeline.Common
         {
             PipelineBuilder = pipelineBuilder;
         }
+        public override ProcessingStage MyStage => ProcessingStage.BeforeParsing;
     }
 }

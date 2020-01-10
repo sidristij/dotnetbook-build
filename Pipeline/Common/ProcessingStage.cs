@@ -6,20 +6,26 @@ namespace BookBuilder.Pipeline.Common
     internal enum ProcessingStage
     {
         Initial,
-        BeforeProcessing,
-        DocumentParsed,
-        BeforeRenderingStarted,
-        RenderingDone,
+        FoldersProcessing,
+        NonParsableFilesProcessing,
+        ParsableFilesProcessing,
+        BeforeParsing,
+        AfterParsing,
+        BeforeRendering,
+        AfterRendering,
         Finished
     }
-    
     internal static class ProcessingStageEx
     {
-        public static IEnumerable<ProcessingStage> Enumerate()
+        private static readonly HashSet<ProcessingStage> Exclusives = new HashSet<ProcessingStage>
+        {
+            ProcessingStage.ParsableFilesProcessing
+        };
+        public static IEnumerable<(ProcessingStage Stage, bool Exclusive)> Enumerate()
         {
             return Enumerable
-                .Range((int) ProcessingStage.Initial, (int) ProcessingStage.Finished - (int) ProcessingStage.Initial)
-                .Select(x => (ProcessingStage) x);
+                .Range((int) ProcessingStage.Initial, (int) ProcessingStage.Finished - (int) ProcessingStage.Initial + 1)
+                .Select(x => (Stage: (ProcessingStage) x, Exclusive: Exclusives.Contains((ProcessingStage)x)));
         }
     }
 }

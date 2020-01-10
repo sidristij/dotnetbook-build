@@ -12,6 +12,6 @@ namespace BookBuilder.Pipeline.Common
             Document = document;
         }
 
-        public override ProcessingStage MyStage => ProcessingStage.DocumentParsed;
+        public override ProcessingStage MyStage => ProcessingStage.AfterParsing;
     }
 }
