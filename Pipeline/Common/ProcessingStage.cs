@@ -18,6 +18,8 @@ namespace BookBuilder.Pipeline.Common
         ParsableFilesProcessing,
         AfterParsableFilesProcessing,
         
+        MdPipelineBuilder,
+        
         BeforeParsing,
         Parsing,
         AfterParsing,
