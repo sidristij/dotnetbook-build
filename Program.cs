@@ -11,6 +11,7 @@ namespace BookBuilder
         static async Task Main(string[] args)
         {
             var processing = new ProjectProcessing();
+            var context = Context.Create().With(processing);
             
             // Parse and enqueue tasks
             Parser.Default.ParseArguments<Options>(args)
@@ -19,12 +20,12 @@ namespace BookBuilder
                     if (Directory.Exists(o.Path))
                     {
                         var po = new ProcessingOptions(o.Path, o.Output, true, ".html");
-                        processing.TryAddTask(new FolderProcessor(processing, po));
+                        processing.TryAddTask(new FolderProcessor(context.CreateCopy(po)));
                     }
                     else
                     {
                         var po = new ProcessingOptions(o.Path, o.Output, false);
-                        processing.TryAddTask(new MarkdownFileProcessor(processing, po));
+                        processing.TryAddTask(new MarkdownFileProcessor(context.CreateCopy(po)));
                     }
                 });
             
