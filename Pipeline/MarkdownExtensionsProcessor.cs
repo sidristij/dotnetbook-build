@@ -7,7 +7,7 @@ namespace BookBuilder.Pipeline
 {
     internal class MarkdownExtensionsProcessorBase : BeforeParsingProcessingBase
     {
-        public MarkdownExtensionsProcessorBase(ProjectProcessing processing, MarkdownPipelineBuilder pipelineBuilder) : base(processing, pipelineBuilder)
+        public MarkdownExtensionsProcessorBase(Context context) : base(context)
         {
         }
 

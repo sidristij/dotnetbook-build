@@ -4,14 +4,18 @@ namespace BookBuilder.Pipeline.Common
 {
     internal abstract class ProcessingItemBase : IProcessingItem
     {
-        protected ProcessingItemBase(ProjectProcessing projectProcessing)
+        protected ProcessingItemBase(Context context)
         {
-            ProjectProcessing = projectProcessing;
+            Context = context;
+            ProjectProcessing = Context.Get<ProjectProcessing>();
         }
 
         protected ProjectProcessing ProjectProcessing { get; }
+        
+        protected Context Context { get; }
 
         public abstract ProcessingStage MyStage { get; }
+        
         public abstract Task DoWorkAsync();
     }
 }

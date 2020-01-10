@@ -4,20 +4,18 @@ using BookBuilder.Pipeline.Common;
 
 namespace BookBuilder.Pipeline
 {
-    internal class ResourceFileProcessor : IProcessingItem
+    internal class ResourceFileProcessor : ProcessingItemBase
     {
-        protected ProjectProcessing ProjectProcessing { get; }
         protected ProcessingOptions Options { get; }
 
-        public ResourceFileProcessor(ProjectProcessing projectProcessing, ProcessingOptions options)
+        public ResourceFileProcessor(Context context) : base(context)
         {
-            ProjectProcessing = projectProcessing;
-            Options = options;
+            Options = Context.Get<ProcessingOptions>();
         }
         
-        public ProcessingStage MyStage => ProcessingStage.NonParsableFilesProcessing;
+        public override ProcessingStage MyStage => ProcessingStage.NonParsableFilesProcessing;
         
-        public async Task DoWorkAsync()
+        public override async Task DoWorkAsync()
         {
             var folderTargetPath = Path.GetDirectoryName(Options.TargetPath);
             if (!Directory.Exists(folderTargetPath)) Directory.CreateDirectory(folderTargetPath);

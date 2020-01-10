@@ -1,4 +1,5 @@
-﻿using Markdig;
+﻿using System;
+using Markdig;
 
 namespace BookBuilder.Pipeline.Common
 {
@@ -6,9 +7,9 @@ namespace BookBuilder.Pipeline.Common
     {
         protected MarkdownPipelineBuilder PipelineBuilder { get; }
         
-        protected BeforeParsingProcessingBase(ProjectProcessing processing, MarkdownPipelineBuilder pipelineBuilder) : base(processing)
+        protected BeforeParsingProcessingBase(Context context) : base(context)
         {
-            PipelineBuilder = pipelineBuilder;
+            PipelineBuilder = Context.Get<MarkdownPipelineBuilder>();
         }
         public override ProcessingStage MyStage => ProcessingStage.BeforeParsing;
     }

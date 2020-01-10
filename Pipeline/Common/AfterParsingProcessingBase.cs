@@ -6,10 +6,9 @@ namespace BookBuilder.Pipeline.Common
     {
         protected MarkdownDocument Document { get; }
 
-        protected AfterParsingProcessingBase(ProjectProcessing processing, MarkdownDocument document) 
-            : base(processing)
+        protected AfterParsingProcessingBase(Context baseContext) : base(baseContext)
         {
-            Document = document;
+            Document = Context.Get<MarkdownDocument>();
         }
 
         public override ProcessingStage MyStage => ProcessingStage.AfterParsing;

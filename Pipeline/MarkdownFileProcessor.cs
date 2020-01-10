@@ -10,19 +10,17 @@ using Markdig.SyntaxHighlighting;
 
 namespace BookBuilder.Pipeline
 {
-    internal class MarkdownFileProcessor : IProcessingItem
+    internal class MarkdownFileProcessor : ProcessingItemBase
     {
-        protected ProjectProcessing ProjectProcessing { get; }
         protected ProcessingOptions Options { get; }
 
-        public MarkdownFileProcessor(ProjectProcessing projectProcessing, ProcessingOptions options)
+        public MarkdownFileProcessor(Context context) : base(context)
         {
-            ProjectProcessing = projectProcessing;
-            Options = options;
+            Options = Context.Get<ProcessingOptions>();
         }
 
-        public ProcessingStage MyStage => ProcessingStage.ParsableFilesProcessing;
-        public async Task DoWorkAsync()
+        public override ProcessingStage MyStage => ProcessingStage.ParsableFilesProcessing;
+        public override async Task DoWorkAsync()
         {
             if (!string.IsNullOrWhiteSpace(Options.SourcePath) && File.Exists(Options.SourcePath))
             {

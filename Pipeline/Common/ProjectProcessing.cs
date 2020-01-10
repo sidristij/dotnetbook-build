@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using BookBuilder.Pipeline;
 
 namespace BookBuilder.Pipeline.Common
 {
@@ -45,6 +44,7 @@ namespace BookBuilder.Pipeline.Common
                     while (_queue[stage].TryDequeue(out var item))
                     {
                         var task = item;
+                        var onStage = stage;
                         tasks.Add(Task.Factory.StartNew(async () =>
                         {
                             try
@@ -53,7 +53,7 @@ namespace BookBuilder.Pipeline.Common
                             }
                             catch(Exception ex)
                             {
-                                Console.WriteLine(ex.Message);
+                                Console.WriteLine($"Error while processing {onStage} stage: {ex.Message}");
                             }
                         }, 
                         CancellationToken.None, 
