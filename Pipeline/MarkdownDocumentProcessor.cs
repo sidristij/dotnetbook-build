@@ -12,11 +12,15 @@ namespace BookBuilder.Pipeline
     internal class MarkdownDocumentProcessor : ProcessingItemBase
     {
         private MarkdownDocument Document => Context.Get<MarkdownDocument>();
+
         private MarkdownPipeline Pipeline => Context.Get<MarkdownPipeline>();
+
         private ProcessingOptions ProcessingOptions => Context.Get<ProcessingOptions>();
+
         private FileDescription FileDescription => Context.Get<FileDescription>();
-        
+
         public override ProcessingStage MyStage => ProcessingStage.Parsing;
+
         public override bool ShouldWorkInExclusiveMode => true;
 
         public MarkdownDocumentProcessor(Context context) : base(context)

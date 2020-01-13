@@ -8,7 +8,8 @@ namespace BookBuilder.Pipeline.Common.Structure
     internal class DocumentStructureEntry
     {
         private ConcurrentBag<DocumentStructureEntry> _subentries;
-        
+        private string title;
+
         public DocumentStructureEntry(FileDescription source, MarkdownDocument document, HeadingBlock block, DocumentStructureEntry parent = null)
         {
             Source = source;
@@ -16,11 +17,17 @@ namespace BookBuilder.Pipeline.Common.Structure
             Block = block;
             Parent = parent;
         }
-        
+
+        public DocumentStructureEntry WithTitle(string title)
+        {
+            this.title = title;
+            return this;
+        }
+
         public FileDescription Source { get; }
 
-        public ReadOnlySpan<char> Title => Block.ToPositionText();
-        
+        public ReadOnlySpan<char> Title => Block?.ToPositionText() ?? title;
+
         public MarkdownDocument Document { get; }
 
         public HeadingBlock Block { get; }

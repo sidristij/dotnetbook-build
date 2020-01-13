@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BookBuilder.Pipeline.Common;
 using BookBuilder.Pipeline.Common.Structure;
 using Markdig;
+using Markdig.Parsers;
 
 namespace BookBuilder.Pipeline
 {
@@ -14,15 +15,18 @@ namespace BookBuilder.Pipeline
 
         public override ProcessingStage MyStage => ProcessingStage.Parsing;
         public override bool ShouldWorkInExclusiveMode => true;
-        
+
         public MarkdownParsingProcessor(Context context) : base(context)
         {
         }
-        
+
         public override async Task DoWorkAsync()
         {
-            var document = Markdown.Parse(File.ReadAllText(ProcessingOptions.SourcePath), Pipeline);
-            var ctx = Context.CreateCopy().With(document);
+            var document = MarkdownParser.Parse(File.ReadAllText(ProcessingOptions.SourcePath), Pipeline);
+            var documentStructure = new DocumentStructureEntry(FileDescription, document, null);
+            var ctx = Context.CreateCopy()
+                .With(document)
+                .With(documentStructure);
 
             ProjectProcessing.TryAddTask(new MarkdownDocumentProcessor(ctx));
         }
