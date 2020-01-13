@@ -8,7 +8,7 @@ namespace BookBuilder.Pipeline
 {
     /// <summary>
     /// Depending on file type redirects file processing to md parser or to resources
-    /// copying task 
+    /// copying task
     /// </summary>
     internal class FolderProcessor : ProcessingItemBase
     {
@@ -28,21 +28,27 @@ namespace BookBuilder.Pipeline
         public override async Task DoWorkAsync()
         {
             var subfolders = Directory.GetDirectories(Opts.SourcePath);
+            var parentFolder = ParentFolder;
+
             foreach (var subfolder in subfolders)
             {
+                var folderDesc = new FolderDescription(ParentFolder?.Root, ParentFolder, subfolder);
+                parentFolder.AddEntry(folderDesc);
+
                 var context = Context.CreateCopy()
                     .With(Opts.Combine(subfolder))
-                    .With(new FolderDescription(ParentFolder?.Root, ParentFolder, subfolder));
-                
-                ProjectProcessing.TryAddTask(
-                    new FolderProcessor(context));
+                    .With(folderDesc);
+
+                ProjectProcessing.TryAddTask(new FolderProcessor(context));
             }
 
             foreach (var filePath in Directory.GetFiles(Opts.SourcePath))
             {
-                var context = Context.CreateCopy()
-                    .With(new FileDescription(ParentFolder?.Root, ParentFolder, Path.GetFileName(filePath)));
-                
+                var fileDesc = new FileDescription(ParentFolder?.Root, ParentFolder, Path.GetFileName(filePath));
+                parentFolder.AddEntry(fileDesc);
+
+                var context = Context.CreateCopy().With(fileDesc);
+
                 if (Path.GetExtension(filePath.AsSpan()).Equals(mdExt.AsSpan(), StringComparison.Ordinal))
                 {
                     context.With(Opts.Combine(filePath, true));

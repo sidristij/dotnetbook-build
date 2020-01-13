@@ -1,24 +1,28 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace BookBuilder.Pipeline.Common.Structure
 {
+    [DebuggerDisplay("Name: ({Name}), Extension: ({Extension}), File")]
     internal class FileDescription : IFileEntry
     {
-        public FileDescription(FolderDescription root, FolderDescription parent, ReadOnlySpan<char> name)
+        private readonly string path;
+
+        public FileDescription(FolderDescription root, FolderDescription parent, string path)
         {
             Root = root;
             Parent = parent;
-            Name = name;
+            this.path = path;
         }
-        
-        public ReadOnlySpan<char> Name { get; }
 
         public bool IsFolder => false;
-        
+
         public FolderDescription Root { get; }
-        
+
         public FolderDescription Parent { get; }
+
+        public ReadOnlySpan<char> Name => Path.GetFileName(path);
 
         public ReadOnlySpan<char> Extension => Path.GetExtension(Name);
     }
