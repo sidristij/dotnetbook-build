@@ -45,13 +45,13 @@ namespace BookBuilder.Pipeline.Common
         
         public Context With<T>(T value)
         {
-            _context.Add(typeof(T), value);
+            _context[typeof(T)] = value;
             return this;
         }
         
         public T Get<T>()
         {
-            return (T)_context[typeof(T)];
+            return _context.TryGetValue(typeof(T), out var res) ? (T)res : default(T);
         }
 
         public Context CreateCopy()

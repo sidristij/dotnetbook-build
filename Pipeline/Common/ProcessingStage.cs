@@ -30,6 +30,7 @@ namespace BookBuilder.Pipeline.Common
         
         Finished
     }
+    
     internal static class ProcessingStageEx
     {
         public static IEnumerable<ProcessingStage> Enumerate()
