@@ -1,27 +1,64 @@
+// {RES_PATH} = ../../../../../../res as default
+@font-face {
+    font-family: 'JB Mono';
+    src: local('JetBrains Mono'),
+    url('{RES_PATH}/fonts/woff2/JetBrainsMono-Italic.woff2') format('woff2'),
+    url('{RES_PATH}/fonts/woff/JetBrainsMono-Italic.woff') format('woff'),
+    url('{RES_PATH}/fonts/ttf/JetBrainsMono-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+}
+@font-face {
+    font-family: 'JB Mono';
+    src: local('JetBrains Mono'),
+    url('{RES_PATH}/fonts/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
+    url('{RES_PATH}/fonts/woff/JetBrainsMono-Regular.woff') format('woff'),
+    url('{RES_PATH}/fonts/ttf/JetBrainsMono-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'JB Mono';
+    src: local('JetBrains Mono'),
+    url('{RES_PATH}/fonts/woff2/JetBrainsMono-Medium-Italic.woff2') format('woff2'),
+    url('{RES_PATH}/fonts/woff/JetBrainsMono-Medium-Italic.woff') format('woff'),
+    url('{RES_PATH}/fonts/ttf/JetBrainsMono-Medium-Italic.ttf') format('truetype');
+    font-weight: 600;
+    font-style: italic;
+}
+@font-face {
+    font-family: 'JB Mono';
+    src: local('JetBrains Mono'),
+    url('{RES_PATH}/fonts/woff2/JetBrainsMono-Medium.woff2') format('woff2'),
+    url('{RES_PATH}/fonts/woff/JetBrainsMono-Medium.woff') format('woff'),
+    url('{RES_PATH}/fonts/ttf/JetBrainsMono-Medium.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
 @font-face {
     font-family: 'PF Regal Text Pro';
     src: local('PF Regal Text Pro RegularA'), local('PF-Regal-Text-Pro-RegularA'),
-    url('/res/fonts/PFRegalTextPro-RegularA.woff2') format('woff2'),
-    url('/res/fonts/PFRegalTextPro-RegularA.woff') format('woff'),
-    url('/res/fonts/PFRegalTextPro-RegularA.ttf') format('truetype');
+    url('{RES_PATH}/fonts/woff2/PFRegalTextPro-RegularA.woff2') format('woff2'),
+    url('{RES_PATH}/fonts/woff/PFRegalTextPro-RegularA.woff') format('woff'),
+    url('{RES_PATH}/fonts/ttf/PFRegalTextPro-RegularA.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
 }
 @font-face {
     font-family: 'PF Regal Text Pro';
     src: local('PF Regal Text Pro RegularB'), local('PF-Regal-Text-Pro-RegularB'),
-    url('/res/fonts/PFRegalTextPro-RegularB.woff2') format('woff2'),
-    url('/res/fonts/PFRegalTextPro-RegularB.woff') format('woff'),
-    url('/res/fonts/PFRegalTextPro-RegularB.ttf') format('truetype');
+    url('{RES_PATH}/fonts/woff2/PFRegalTextPro-RegularB.woff2') format('woff2'),
+    url('{RES_PATH}/fonts/woff/PFRegalTextPro-RegularB.woff') format('woff'),
+    url('{RES_PATH}/fonts/ttf/PFRegalTextPro-RegularB.ttf') format('truetype');
     font-weight: 600;
     font-style: normal;
 }
 @font-face {
     font-family: 'PF Regal Text Pro';
     src: local('PF Regal Text Pro RegularB Italic'), local('PF-Regal-Text-Pro-RegularB-Italic'),
-    url('/res/fonts/PFRegalTextPro-RegularBItalic.woff2') format('woff2'),
-    url('/res/fonts/PFRegalTextPro-RegularBItalic.woff') format('woff'),
-    url('/res/fonts/PFRegalTextPro-RegularBItalic.ttf') format('truetype');
+    url('{RES_PATH}/fonts/woff2/PFRegalTextPro-RegularBItalic.woff2') format('woff2'),
+    url('{RES_PATH}/fonts/woff/PFRegalTextPro-RegularBItalic.woff') format('woff'),
+    url('{RES_PATH}/fonts/ttf/PFRegalTextPro-RegularBItalic.ttf') format('truetype');
     font-weight: 600;
     font-style: italic;
 }
@@ -29,15 +66,25 @@
 p, li {
     margin: 0 0 14px;
     font-family: PF Regal,PF Regal Text Pro,Georgia,serif;
-    font-size: 18px;
+    font-size: 20px;
     line-height: 26px;
 }
 
-p code {
-    font-family: consolas, monospace;
-    font-size: 17px;
-    background-color: aliceblue;
-    padding: 4px 6px;
+code, .lang-csharp span, .lang-csharp pre {
+    font-family: JB Mono, monospace !important;
+}
+
+.lang-csharp {
+    padding: 4px 0px 14px 20px;
+}
+
+code {
+    font-size: 16px;
+}
+
+.lang-csharp span, .lang-csharp pre {
+    font-size: 16px;
+    line-height: 20px;
 }
 
 p a {
