@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using BookBuilder.Pipeline.Common;
 using BookBuilder.Pipeline.Common.Structure;
@@ -29,7 +28,7 @@ namespace BookBuilder.Pipeline
 
         public override async Task DoWorkAsync()
         {
-            await using var writer = new StreamWriter(ProcessingOptions.TargetPath, false, Encoding.UTF8);
+            await using var writer = new StringWriter();
 
             var renderer = new HtmlRenderer(writer);
             Pipeline.Setup(renderer);
@@ -37,6 +36,12 @@ namespace BookBuilder.Pipeline
             renderer.Render(Document);
 
             await renderer.Writer.FlushAsync();
+
+            var result = writer.ToString();
+
+            var ctx = Context.CreateCopy().With(new DocumentHolder{ DocumentBody = result });
+            
+            ProjectProcessing.TryAddTask(new ApplyTemplatesProcessor(ctx));
         }
     }
 }

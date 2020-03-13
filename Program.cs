@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using BookBuilder.Pipeline;
 using BookBuilder.Pipeline.Common;
@@ -18,9 +19,19 @@ namespace BookBuilder
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(o =>
                 {
+                    var templateFile = Path.Combine(Path.GetDirectoryName(o.Path), "template.htm");
+                    string template = null;
+                    if (File.Exists(templateFile))
+                    {
+                        template = File.ReadAllText(templateFile);
+                    }
                     if (Directory.Exists(o.Path))
                     {
                         var po = new ProcessingOptions(o.Path, o.Output, true, ".html");
+                        if (template != null)
+                        {
+                            context.With(new TemplateStorage(template));
+                        }
                         processing.TryAddTask(new FolderProcessor(context.CreateCopy(po).With(new FolderDescription(null, null, "/"))));
                     }
                     else
@@ -33,4 +44,14 @@ namespace BookBuilder
             await processing.StartProcessingAsync();
         }
     }
+
+    public struct TemplateStorage
+    {
+        public TemplateStorage(string template)
+        {
+            Template = template;
+        }
+        public string Template { get; private set; }
+    }
+
 }
