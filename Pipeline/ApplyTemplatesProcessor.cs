@@ -1,8 +1,11 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BookBuilder.Pipeline.Common;
 using BookBuilder.Pipeline.Common.Structure;
+using BookBuilder.Pipeline.Templates;
 using Markdig;
 using Markdig.Renderers;
 using Markdig.Syntax;
@@ -22,7 +25,6 @@ namespace BookBuilder.Pipeline
         private ProcessingOptions ProcessingOptions => Context.Get<ProcessingOptions>();
         public override ProcessingStage MyStage => ProcessingStage.Parsing;
 
-        public override bool ShouldWorkInExclusiveMode => true;
 
         public ApplyTemplatesProcessor(Context context) : base(context)
         {
@@ -30,10 +32,18 @@ namespace BookBuilder.Pipeline
 
         public override async Task DoWorkAsync()
         {
-            var newDocument = Template?.Replace("<!--BODY-->", DocumentBody) ?? DocumentBody;            
+            var document = Template ?? DocumentBody;
+            var changed = false;
+            var templatesProcessor = new AggregateTemplateProcessor(Context);
+            do
+            {
+                var oldDocument = document;
+                document = templatesProcessor.Apply(oldDocument);
+                changed = oldDocument != document;
+            } while (!changed);
 
             await using var writer = new StreamWriter(ProcessingOptions.TargetPath, false, Encoding.UTF8);
-            writer.Write(newDocument);
+            writer.Write(document);
         }
     }
 }
