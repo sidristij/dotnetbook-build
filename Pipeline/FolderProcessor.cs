@@ -12,12 +12,12 @@ namespace BookBuilder.Pipeline
     /// </summary>
     internal class FolderProcessor : ProcessingItemBase
     {
-        private static string mdExt = ".md";
-        private static string targetExt = ".html";
+        private const string MdExt = ".md";
+        private const string TargetExt = ".html";
 
-        protected ProcessingOptions Opts => Context.Get<ProcessingOptions>();
+        private ProcessingOptions Opts => Context.Get<ProcessingOptions>();
 
-        protected FolderDescription ParentFolder => Context.Get<FolderDescription>();
+        private FolderDescription ParentFolder => Context.Get<FolderDescription>();
 
         public FolderProcessor(Context context) : base(context)
         {
@@ -49,7 +49,7 @@ namespace BookBuilder.Pipeline
 
                 var context = Context.CreateCopy().With(fileDesc);
 
-                if (Path.GetExtension(filePath.AsSpan()).Equals(mdExt.AsSpan(), StringComparison.Ordinal))
+                if (Path.GetExtension(filePath.AsSpan()).Equals(MdExt.AsSpan(), StringComparison.Ordinal))
                 {
                     context.With(Opts.Combine(filePath, true));
                     ProjectProcessing.TryAddTask(new MarkdownFileProcessor(context));

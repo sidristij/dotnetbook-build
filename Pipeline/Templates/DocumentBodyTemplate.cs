@@ -11,6 +11,9 @@ namespace BookBuilder.Pipeline.Templates
             _documentHolder = context.Get<DocumentHolder>();
         }
 
+        /// <summary>
+        /// Global template, which is used to generate the whole file
+        /// </summary>
         public override string Apply(string source)
         {
             return source.Replace("<!--BODY-->", _documentHolder.DocumentBody);

@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using BookBuilder.Pipeline.Common;
-using BookBuilder.Pipeline.Common.Structure;
 using Markdig;
 using Markdig.Renderers;
 using Markdig.Syntax;
@@ -13,10 +12,6 @@ namespace BookBuilder.Pipeline
         private MarkdownDocument Document => Context.Get<MarkdownDocument>();
 
         private MarkdownPipeline Pipeline => Context.Get<MarkdownPipeline>();
-
-        private ProcessingOptions ProcessingOptions => Context.Get<ProcessingOptions>();
-
-        private FileDescription FileDescription => Context.Get<FileDescription>();
 
         public override ProcessingStage MyStage => ProcessingStage.Parsing;
 

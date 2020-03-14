@@ -14,17 +14,13 @@ namespace BookBuilder.Pipeline
 {
     internal class ApplyTemplatesProcessor : ProcessingItemBase
     {
-        private MarkdownDocument Document => Context.Get<MarkdownDocument>();
-
-        private MarkdownPipeline Pipeline => Context.Get<MarkdownPipeline>();
-
         private string DocumentBody => Context.Get<DocumentHolder>().DocumentBody;
 
         private string Template => Context.Get<TemplateStorage>().Template;
 
-        private ProcessingOptions ProcessingOptions => Context.Get<ProcessingOptions>();
         public override ProcessingStage MyStage => ProcessingStage.Parsing;
 
+        private ProcessingOptions ProcessingOptions => Context.Get<ProcessingOptions>();
 
         public ApplyTemplatesProcessor(Context context) : base(context)
         {
@@ -35,6 +31,7 @@ namespace BookBuilder.Pipeline
             var document = Template ?? DocumentBody;
             var changed = false;
             var templatesProcessor = new AggregateTemplateProcessor(Context);
+        
             do
             {
                 var oldDocument = document;

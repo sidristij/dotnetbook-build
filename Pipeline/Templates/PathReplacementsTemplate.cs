@@ -7,24 +7,24 @@ namespace BookBuilder.Pipeline.Templates
 {
     internal class PathReplacementsTemplate : TemplateBase
     {
-        private Dictionary<string, string> resourcesPathes = new Dictionary<string, string>
+        private readonly Dictionary<string, string> _resourcesPaths = new Dictionary<string, string>
         {
             {"{RES_PATH}", @"./res"}
         };
         
         public PathReplacementsTemplate(Context context) : base(context)
         {
-            foreach (var (template, target) in resourcesPathes.ToList())
+            foreach (var (template, target) in _resourcesPaths.ToList())
             {
-                resourcesPathes[template] = Path.Combine(
-                    MakeRelativePath(_processingOptions.TargetPath, _processingOptions.TargetRootPath),
+                _resourcesPaths[template] = Path.Combine(
+                    MakeRelativePath(ProcessingOptions.TargetPath, ProcessingOptions.TargetRootPath),
                     target);
             }
         }
 
         public override string Apply(string incoming)
         {
-            foreach (var (template, target) in resourcesPathes)
+            foreach (var (template, target) in _resourcesPaths)
             {
                 incoming = incoming.Replace(template, target);
             }

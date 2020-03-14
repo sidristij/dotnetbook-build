@@ -8,9 +8,11 @@ namespace BookBuilder.Pipeline.Templates
     {
         public ImportFileTemplate(Context context) : base(context)
         {
-            
         }
         
+        /// <summary>
+        /// Used to do whole file body import.
+        /// </summary>
         public override string Apply(string incoming)
         {
             if (TryFindArea(incoming, "<!--import:", "-->", out var fileRelativePath, out var region))

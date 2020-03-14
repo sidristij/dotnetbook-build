@@ -2,14 +2,12 @@
 using System.IO;
 using System.Threading.Tasks;
 using BookBuilder.Pipeline.Common;
-using BookBuilder.Pipeline.Common.Structure;
 
 namespace BookBuilder.Pipeline
 {
     internal class MarkdownFileProcessor : ProcessingItemBase
     {
         protected ProcessingOptions Options => Context.Get<ProcessingOptions>();
-        protected FileDescription FileDescription => Context.Get<FileDescription>();
 
         public MarkdownFileProcessor(Context context) : base(context)
         {

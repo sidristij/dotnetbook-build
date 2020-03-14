@@ -6,11 +6,11 @@ namespace BookBuilder.Pipeline.Templates
 {
     internal abstract class TemplateBase : ITemplate
     {
-        protected readonly ProcessingOptions _processingOptions;
+        protected readonly ProcessingOptions ProcessingOptions;
 
         protected TemplateBase(Context context)
         {
-            _processingOptions = context.Get<ProcessingOptions>();
+            ProcessingOptions = context.Get<ProcessingOptions>();
         }
 
         public abstract string Apply(string incoming);
@@ -37,12 +37,12 @@ namespace BookBuilder.Pipeline.Templates
         {
             return Path.Combine(
                 relative.StartsWith('.') 
-                    ? _processingOptions.TargetPath 
+                    ? ProcessingOptions.TargetPath 
                     : Environment.CurrentDirectory, 
                 relative);
         }
-        
-        public static string MakeRelativePath(string fromPath, string toPath)
+
+        protected static string MakeRelativePath(string fromPath, string toPath)
         {
             if (string.IsNullOrEmpty(fromPath)) throw new ArgumentNullException(nameof(fromPath));
             if (string.IsNullOrEmpty(toPath))   throw new ArgumentNullException(nameof(toPath));
@@ -53,12 +53,7 @@ namespace BookBuilder.Pipeline.Templates
             if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
 
             var relativeUri = fromUri.MakeRelativeUri(toUri);
-            string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
-            // if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
-            // {
-            //     relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            // }
+            var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
             return relativePath;
         }

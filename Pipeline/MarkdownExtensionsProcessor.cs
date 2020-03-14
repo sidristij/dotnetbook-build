@@ -8,7 +8,6 @@ namespace BookBuilder.Pipeline
 {
     internal class MarkdownExtensionsProcessor : ProcessingItemBase
     {
-        private MarkdownPipelineBuilder PipelineBuilder => Context.Get<MarkdownPipelineBuilder>();
         private ProcessingOptions ProcessingOptions => Context.Get<ProcessingOptions>();
         
         public MarkdownExtensionsProcessor(Context context) : base(context)
