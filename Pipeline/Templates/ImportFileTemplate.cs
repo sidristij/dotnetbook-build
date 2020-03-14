@@ -15,18 +15,18 @@ namespace BookBuilder.Pipeline.Templates
         /// </summary>
         public override string Apply(string incoming)
         {
-            if (TryFindArea(incoming, "<!--import:", "-->", out var fileRelativePath, out var region))
+            if (TryFindArea(incoming, "<!--clone-from:", "-->", out var fileRelativePath, out var region))
             {
-                var filePath = GetPath(fileRelativePath);
+                var resourcesSourcePath = Path.Combine(ProcessingOptions.Resources, fileRelativePath);
                 try
                 {
-                    var contents = File.ReadAllText(filePath);
+                    var contents = File.ReadAllText(resourcesSourcePath);
                     var replace = incoming.Replace(incoming.Substring(region.start, region.length), contents);
                     return replace;
                 }
                 catch (IOException exception)
                 {
-                    Console.WriteLine($"Error occured wile trying to read importing file: `{fileRelativePath}`-> `{filePath}`: {exception.Message}");
+                    Console.WriteLine($"Error occured wile trying to read importing file: `{fileRelativePath}`-> `{fileRelativePath}`: {exception.Message}");
                     return incoming;
                 }
             }

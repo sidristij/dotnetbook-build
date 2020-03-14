@@ -19,7 +19,8 @@ namespace BookBuilder
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(o =>
                 {
-                    var templateFile = Path.Combine(Path.GetDirectoryName(o.Path), "template.htm");
+                    var templateFile = Path.Combine(o.Resources, @"template.htm");
+                    
                     string template = null;
                     if (File.Exists(templateFile))
                     {
@@ -27,7 +28,7 @@ namespace BookBuilder
                     }
                     if (Directory.Exists(o.Path))
                     {
-                        var po = new ProcessingOptions(o.Path, o.Output, true, ".html");
+                        var po = new ProcessingOptions(o.Path, o.Output, o.Resources, true, ".html");
                         if (template != null)
                         {
                             context.With(new TemplateStorage(template));
@@ -36,7 +37,7 @@ namespace BookBuilder
                     }
                     else
                     {
-                        var po = new ProcessingOptions(o.Path, o.Output, false);
+                        var po = new ProcessingOptions(o.Path, o.Output, o.Resources, false);
                         processing.TryAddTask(new MarkdownFileProcessor(context.CreateCopy(po)));
                     }
                 });

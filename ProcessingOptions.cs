@@ -4,8 +4,9 @@ namespace BookBuilder
 {
     internal class ProcessingOptions
     {
-        public ProcessingOptions(string src, string target, bool isFolder = true, string targetExt = null)
+        public ProcessingOptions(string src, string target, string resources, bool isFolder = true, string targetExt = null)
         {
+            Resources = resources;
             IsFolder = isFolder;
             TargetExt = targetExt;
             SourcePath = SourceRootPath = Path.IsPathRooted(src) ? src : Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), src));
@@ -13,6 +14,8 @@ namespace BookBuilder
         }
 
         private ProcessingOptions() { }
+
+        public string Resources { get; set; }
 
         public bool IsFolder { get; set; }
 
@@ -42,6 +45,7 @@ namespace BookBuilder
 
             return new ProcessingOptions
             {
+                Resources = Resources,
                 SourcePath = relativeSrc,
                 SourceRootPath = SourceRootPath,
                 TargetPath = relativeTarget,
