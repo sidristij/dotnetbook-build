@@ -20,7 +20,7 @@ namespace BookBuilder
                 .WithParsed(o =>
                 {
                     var templateFile = Path.Combine(o.Resources, @"template.htm");
-                    
+
                     string template = null;
                     if (File.Exists(templateFile))
                     {
@@ -52,7 +52,7 @@ namespace BookBuilder
         {
             Template = template;
         }
-        public string Template { get; private set; }
-    }
 
+        public string Template { get; }
+    }
 }

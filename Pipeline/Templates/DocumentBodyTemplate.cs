@@ -16,7 +16,7 @@ namespace BookBuilder.Pipeline.Templates
         /// </summary>
         public override string Apply(string source)
         {
-            return source.Replace("<!--BODY-->", _documentHolder.DocumentBody);
+            return source.Replace("<!--document-body-->", _documentHolder.DocumentBody);
         }
     }
 }
