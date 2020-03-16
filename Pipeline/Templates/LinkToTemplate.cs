@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BookBuilder.Helpers;
 using BookBuilder.Pipeline.Common;
 
 namespace BookBuilder.Pipeline.Templates
@@ -9,7 +10,7 @@ namespace BookBuilder.Pipeline.Templates
         public LinkToTemplate(Context context) : base(context)
         {
         }
-        
+
         /// <summary>
         /// Used to do whole file body import.
         /// </summary>
@@ -18,7 +19,7 @@ namespace BookBuilder.Pipeline.Templates
             if (TryFindArea(incoming, "<!--link-root:", "-->", out var fileRelativePath, out var region))
             {
                 // fileRelativePath is relative to project target root
-                var rootRelative = MakeRelativePath(ProcessingOptions.TargetPath, ProcessingOptions.TargetRootPath);
+                var rootRelative = PathHelper.MakeRelativePath(ProcessingOptions.TargetPath, ProcessingOptions.TargetRootPath);
                 var filePath = Path.Combine(rootRelative, fileRelativePath);
                 try
                 {
