@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BookBuilder.Pipeline.Common;
 using Markdig;
 using Markdig.Renderers;
+using Markdig.Renderers.Html;
 using Markdig.Syntax;
 
 namespace BookBuilder.Pipeline
