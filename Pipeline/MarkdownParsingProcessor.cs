@@ -63,6 +63,7 @@ namespace BookBuilder.Pipeline
                     parent.AddChild(entry);
                     break;
                 }
+
                 case HeadingBlock header when entry.Depth <= header.Level:
                 {
                     var cur = entry;
@@ -72,9 +73,8 @@ namespace BookBuilder.Pipeline
                     cur.AddChild(entry);
                     break;
                 }
+
                 case Table table:
-                    
-                    // f(rowIndex)(colIndex) -> cellLength
                     var rows = table.Descendants().OfType<TableRow>()
                         .Select((row, rowIndex) =>
                         (
@@ -85,15 +85,17 @@ namespace BookBuilder.Pipeline
                             rowIndex
                         )).ToList();
                     
-                    // map(column) -> cell_max_length
                     var tableParameters = GetTableParameters(rows);
-
-                    var totalLength = tableParameters.TotalLength;
-                    var tableProps = tableParameters.GetLayoutInfo(); 
+                    var tableProps = tableParameters.GetLayoutInfo();
+                    
                     table.SetAttributes(
                         new HtmlAttributes
                         {
-                            Classes = new List<string>{"col-" + tableProps.Width, "offset-" + tableProps.Offsetu}
+                            Classes = new List<string>
+                            {
+                                "offset-" + tableProps.Offset,
+                                "col-" + tableProps.Width, 
+                            }
                         });
                     break;
             }
