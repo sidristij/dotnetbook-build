@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,14 +30,6 @@ namespace BookBuilder.Pipeline
         public MarkdownParsingProcessor(Context context) : base(context)
         {
         }
-
-        private List<(int maxLength, int size, int Skip)> TableSizes = new List<(int, int, int)>
-        {
-            (0,        6,  3),
-            (256,      8,  2),
-            (1024,     10, 1),
-            (1024+512, 12, 0)
-        };
         
         public override async Task DoWorkAsync()
         {
@@ -80,29 +73,28 @@ namespace BookBuilder.Pipeline
                     break;
                 }
                 case Table table:
+                    
+                    // f(rowIndex)(colIndex) -> cellLength
                     var rows = table.Descendants().OfType<TableRow>()
                         .Select((row, rowIndex) =>
                         (
                             row.Descendants()
                                 .OfType<TableCell>()
-                                .Select((cell, colIndex) => (cell.GetTextLength(), colIndex))
+                                .Select((cell, colIndex) => (cellLength: cell.CalculateTextLength(), colIndex))
                                 .ToList(),
                             rowIndex
                         )).ToList();
                     
-                    var map = new Dictionary<int, int>(rows.First().Item1.Select(col => new KeyValuePair<int, int>(col.colIndex, col.Item1)));
-                    foreach (var (cols, rowIndex) in rows.Skip(1))
-                    {
-                        for (var i = 0; i < cols.Count; i++)
-                        {
-                            if (map[i] < cols[i].Item1)
-                                map[i] = cols[i].Item1;
-                        }
-                    }
+                    // map(column) -> cell_max_length
+                    var tableParameters = GetTableParameters(rows);
 
-                    var totalLength = map.Sum(x => x.Value);
-                    var tableProps = TableSizes.Last(x => x.maxLength < totalLength);
-                    table.SetAttributes(new HtmlAttributes {Classes = new List<string>{"col-" + tableProps.size, "offset-" + tableProps.Skip}});
+                    var totalLength = tableParameters.TotalLength;
+                    var tableProps = tableParameters.GetLayoutInfo(); 
+                    table.SetAttributes(
+                        new HtmlAttributes
+                        {
+                            Classes = new List<string>{"col-" + tableProps.Width, "offset-" + tableProps.Offsetu}
+                        });
                     break;
             }
 
@@ -110,6 +102,57 @@ namespace BookBuilder.Pipeline
             {
                 VisitMarkdownObject(document, descendant, ref entry);
             }
+        }
+
+        private static TableParameters GetTableParameters(
+            IReadOnlyCollection<(List<(int cellLength, int colIndex)> columns, int rowIndex)> rows)
+        {
+            var map = rows.First().columns.ToDictionary(o => o.colIndex, o => o.cellLength);
+
+            rows.Skip(1)
+                .Aggregate(
+                    map,
+                    (agr, nextItem) =>
+                    {
+                        for (var i = 0; i < agr.Count; i++)
+                        {
+                            if (agr[i] < nextItem.columns[i].cellLength)
+                                agr[i] = nextItem.columns[i].cellLength;
+                        }
+                        return agr;
+                    });
+            return new TableParameters(map);
+        }
+    }
+
+    internal class TableParameters
+    {
+        private readonly Dictionary<int, int> _cellsInfo;
+
+        private List<(int MaxLength, int Size, int Skip)> _tableSizes = new List<(int, int, int)>
+        {
+            (0,        6,  3),
+            (256,      8,  2),
+            (1024,     10, 1),
+            (1024+512, 12, 0)
+        };
+
+        public TableParameters(Dictionary<int, int> cellsInfo)
+        {
+            _cellsInfo = cellsInfo;
+            TotalLength = _cellsInfo.Sum(x => x.Value);
+        }
+
+        public int ColumnsCount => _cellsInfo.Count;
+
+        public int TotalLength { get; }
+
+        public int GetColumnMaxLength(int columnIndex) => _cellsInfo[columnIndex];
+
+        public (int Offset, int Width) GetLayoutInfo()
+        {
+            var (_, size, skip) = _tableSizes.Last(x => x.MaxLength < TotalLength);
+            return (skip, size);
         }
     }
 }

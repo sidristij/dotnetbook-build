@@ -9,9 +9,9 @@ namespace BookBuilder.Extensions
     public static class EnumerableEx
     {
         public static IEnumerable<(TableCell Cell, int Length)> Traverse(this IEnumerable<TableCell> root) =>
-            root.Select(cell => (cell, cell.GetTextLength()));
+            root.Select(cell => (cell, cell.CalculateTextLength()));
 
-        public static int GetTextLength(this TableCell root)
+        public static int CalculateTextLength(this TableCell root)
         {
             var stack = new Stack<MarkdownObject>(root);
             int length = 0;
