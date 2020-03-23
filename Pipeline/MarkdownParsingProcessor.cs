@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,9 +7,7 @@ using BookBuilder.Pipeline.Common;
 using BookBuilder.Pipeline.Common.Structure;
 using Markdig;
 using Markdig.Extensions.Tables;
-using Markdig.Helpers;
 using Markdig.Parsers;
-using Markdig.Renderers.Html;
 using Markdig.Syntax;
 
 namespace BookBuilder.Pipeline
@@ -75,7 +72,8 @@ namespace BookBuilder.Pipeline
                 }
 
                 case Table table:
-                    var rows = table.Descendants().OfType<TableRow>()
+                    var rows = table
+                        .Descendants().OfType<TableRow>()
                         .Select((row, rowIndex) =>
                         (
                             row.Descendants()
@@ -85,18 +83,12 @@ namespace BookBuilder.Pipeline
                             rowIndex
                         )).ToList();
                     
-                    var tableParameters = GetTableParameters(rows);
+                    var tableParameters = GetTableParameters(table, rows);
                     var tableProps = tableParameters.GetLayoutInfo();
-                    
-                    table.SetAttributes(
-                        new HtmlAttributes
-                        {
-                            Classes = new List<string>
-                            {
-                                "offset-" + tableProps.Offset,
-                                "col-" + tableProps.Width, 
-                            }
-                        });
+
+                    table
+                        .WrapWith(document, "offset-" + tableProps.Offset, "col-" + tableProps.Width)
+                        .WrapWith(document,"row");
                     break;
             }
 
@@ -106,7 +98,7 @@ namespace BookBuilder.Pipeline
             }
         }
 
-        private static TableParameters GetTableParameters(
+        private static TableParameters GetTableParameters(Table table,
             IReadOnlyCollection<(List<(int cellLength, int colIndex)> columns, int rowIndex)> rows)
         {
             var map = rows.First().columns.ToDictionary(o => o.colIndex, o => o.cellLength);
@@ -123,29 +115,33 @@ namespace BookBuilder.Pipeline
                         }
                         return agr;
                     });
-            return new TableParameters(map);
+            return new TableParameters(table, map);
         }
     }
 
     internal class TableParameters
     {
+        private readonly Table _table;
         private readonly Dictionary<int, int> _cellsInfo;
 
-        private List<(int MaxLength, int Size, int Skip)> _tableSizes = new List<(int, int, int)>
+        private List<(int MaxLength, int Size, int Skip, int Columns)> _tableSizes = new List<(int, int, int, int)>
         {
-            (0,        6,  3),
-            (256,      8,  2),
-            (1024,     10, 1),
-            (1024+512, 12, 0)
+            // symbols, width, offset, max columns count
+            (0,         8,     4,      3),
+            (12,        6,     3,      4),
+            (128,       8,     2,      8),
+            (256,       10,    1,      10),
+            (384,       12,    0,      100)
         };
 
-        public TableParameters(Dictionary<int, int> cellsInfo)
+        public TableParameters(Table table, Dictionary<int, int> cellsInfo)
         {
+            _table = table;
             _cellsInfo = cellsInfo;
             TotalLength = _cellsInfo.Sum(x => x.Value);
         }
 
-        public int ColumnsCount => _cellsInfo.Count;
+        public int ColumnsCount => _table.ColumnDefinitions.Count;
 
         public int TotalLength { get; }
 
@@ -153,7 +149,24 @@ namespace BookBuilder.Pipeline
 
         public (int Offset, int Width) GetLayoutInfo()
         {
-            var (_, size, skip) = _tableSizes.Last(x => x.MaxLength < TotalLength);
+            var allowed = _tableSizes
+                .Select((val, index) =>
+                    (
+                        index, 
+                        byLen: val.MaxLength < TotalLength, 
+                        byCol: val.Columns >= ColumnsCount
+                    )
+                )
+                .ToList();
+            
+            var allowedByLength = 
+                allowed.Last(x => x.byLen).index;
+            
+            var allowedByColsCount = 
+                Enumerable.Range(allowedByLength, _tableSizes.Count - allowedByLength)
+                .First(x => allowed[x].byCol);
+
+            var (_, size, skip, _) = _tableSizes[allowed[allowedByColsCount].index];
             return (skip, size);
         }
     }
