@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using BookBuilder.Pipeline.Common;
 using Markdig;
@@ -34,6 +35,11 @@ namespace BookBuilder.Pipeline
             await renderer.Writer.FlushAsync();
 
             var result = writer.ToString();
+
+            result = result
+                .Replace(" - ", " &mdash; ")
+                .Replace("\" ", "&raquo; ", StringComparison.Ordinal)
+                .Replace(" \"", " &laquo;", StringComparison.Ordinal);
 
             var ctx = Context.CreateCopy().With(new DocumentHolder{ DocumentBody = result });
             
