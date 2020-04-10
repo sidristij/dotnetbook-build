@@ -2,6 +2,7 @@
 using BookBuilder.Extensions;
 using BookBuilder.Pipeline.Common;
 using Markdig;
+using Markdig.Extensions.SmartyPants;
 using Markdig.SyntaxHighlighting;
 
 namespace BookBuilder.Pipeline
@@ -9,22 +10,28 @@ namespace BookBuilder.Pipeline
     internal class MarkdownExtensionsProcessor : ProcessingItemBase
     {
         private ProcessingOptions ProcessingOptions => Context.Get<ProcessingOptions>();
-        
+
         public MarkdownExtensionsProcessor(Context context) : base(context)
         {
         }
 
         public override ProcessingStage MyStage => ProcessingStage.MdPipelineBuilder;
-        
+
         public override bool ShouldWorkInExclusiveMode => true;
-        
+
         public override async Task DoWorkAsync()
         {
+            var smartyOptions = new SmartyPantOptions();
+            smartyOptions.Mapping[SmartyPantType.LeftDoubleQuote] = "&laquo;";
+            smartyOptions.Mapping[SmartyPantType.RightDoubleQuote] = "&raquo;";
+
             var pipelineBuilder = new MarkdownPipelineBuilder();
-            var newContext = 
+            var newContext =
                 Context.CreateCopy()
                     .With(pipelineBuilder)
-                    .With(pipelineBuilder.UseAdvancedExtensions()
+                    .With(pipelineBuilder
+                        .UseAdvancedExtensions()
+                        .UseSmartyPants(smartyOptions)
                         .UseSyntaxHighlighting()
                         .UseMarkdownLocalLinksPatchingExtension(ProcessingOptions)
                         .UsePodcastFrameSupport(new PodcastSupportOptions{Width = "400px", Height = "102px"})

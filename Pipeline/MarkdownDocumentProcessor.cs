@@ -36,15 +36,8 @@ namespace BookBuilder.Pipeline
 
             var result = writer.ToString();
 
-            result = result
-                .Replace(" - ", " &mdash; ")
-                .Replace(" &quot;", " &laquo;", StringComparison.Ordinal)
-                .Replace("&quot; ", "&raquo; ", StringComparison.Ordinal)
-                .Replace("&quot;,", "&raquo;,", StringComparison.Ordinal)
-                ;
-
             var ctx = Context.CreateCopy().With(new DocumentHolder{ DocumentBody = result });
-            
+
             ProjectProcessing.TryAddTask(new ApplyTemplatesProcessor(ctx));
         }
     }
