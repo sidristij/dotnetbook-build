@@ -22,6 +22,7 @@ namespace BookBuilder.Pipeline
         public override async Task DoWorkAsync()
         {
             var smartyOptions = new SmartyPantOptions();
+            smartyOptions.Mapping[SmartyPantType.Dash2] = " &mdash; ";
             smartyOptions.Mapping[SmartyPantType.LeftDoubleQuote] = "&laquo;";
             smartyOptions.Mapping[SmartyPantType.RightDoubleQuote] = "&raquo;";
 
@@ -33,6 +34,7 @@ namespace BookBuilder.Pipeline
                         .UseAdvancedExtensions()
                         .UseSmartyPants(smartyOptions)
                         .UseSyntaxHighlighting()
+                        .UseSidenotes()
                         .UseMarkdownLocalLinksPatchingExtension(ProcessingOptions)
                         .UsePodcastFrameSupport(new PodcastSupportOptions{Width = "400px", Height = "102px"})
                         .Build());

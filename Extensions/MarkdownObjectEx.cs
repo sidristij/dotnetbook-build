@@ -31,7 +31,7 @@ namespace BookBuilder.Extensions
                         length += paragraphBlock.Span.Length;
                         break;
                 }
-                
+
                 foreach(var child in current.Descendants())
                     stack.Push(child);
             }
@@ -54,12 +54,11 @@ namespace BookBuilder.Extensions
             {
                 if (parent[i] == obj)
                 {
-                    var wrapper = new CustomContainer(new CustomContainerParser())
-                    {
-                        obj
-                    };
+                    var wrapper = new CustomContainer(new CustomContainerParser());
+                    parent.RemoveAt(i);
+                    parent.Insert(i, wrapper);
                     wrapper.SetAttributes(attributes);
-                    parent[i] = wrapper;
+                    wrapper.Insert(0, obj);
                     return wrapper;
                 }
             }
