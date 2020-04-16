@@ -24,7 +24,7 @@ namespace BookBuilder.Extensions
                 Class = null
             };
         }
-        
+
         public void Setup(MarkdownPipelineBuilder pipeline)
         {
         }
@@ -62,17 +62,20 @@ namespace BookBuilder.Extensions
 
             return false;
         }
-        
+
         private class KnownProvider
         {
             public string HostPrefix { get; set; }
             public Func<Uri, string> Delegate { get; set; }
+
+            public string Class { get; set; }
             public bool AllowFullScreen { get; set; } = true; //Should be false for audio embedding
         }
 
         private static readonly List<KnownProvider> KnownHosts = new List<KnownProvider>()
         {
-            new KnownProvider {HostPrefix = "anchor.fm", Delegate = AnchorFm},
+            new KnownProvider {HostPrefix = "anchor.fm", Delegate = AnchorFm, Class = "music-player anchor-music-player"},
+            new KnownProvider {HostPrefix = "music.yandex.ru", Delegate = YandexMusic, Class = "music-player yandex-music-player"},
         };
 
         private static string AnchorFm(Uri arg)
@@ -81,7 +84,14 @@ namespace BookBuilder.Extensions
             var episodeId = path.Substring(path.LastIndexOf('/') + 1);
             return $"https://anchor.fm/stanislav-sidristij/embed/episodes/ep-{episodeId}";
         }
-        
+
+        private static string YandexMusic(Uri arg)
+        {
+            var path = arg.AbsolutePath;
+            var episodeId = path.Substring(path.LastIndexOf('/') + 1);
+            return $"https://music.yandex.ru/iframe/#album/{episodeId}";
+        }
+
         private static HtmlAttributes GetHtmlAttributes(LinkInline linkInline)
         {
             var htmlAttributes = new HtmlAttributes();

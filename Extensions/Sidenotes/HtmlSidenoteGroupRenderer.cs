@@ -1,4 +1,5 @@
-﻿using Markdig.Renderers;
+﻿using System.Linq;
+using Markdig.Renderers;
 using Markdig.Renderers.Html;
 
 namespace BookBuilder.Extensions.Footnotes
@@ -21,18 +22,15 @@ namespace BookBuilder.Extensions.Footnotes
         protected override void Write(HtmlRenderer renderer, SidenoteGroup sidenotes)
         {
             renderer.EnsureLine();
-            renderer.WriteLine($"<div class=\"{GroupClass}\">");
-            renderer.WriteLine("</ol>");
-
+            var hasMedia = sidenotes.OfType<Sidenote>().Any(note => note.Label == ">m");
+            var sideClass = hasMedia ? "side-media-block" : "side-regular-block";
+            renderer.WriteLine($"<div class=\"{GroupClass} {sideClass}\">");
             for (int i = 0; i < sidenotes.Count; i++)
             {
                 var footnote = (Sidenote)sidenotes[i];
-                renderer.WriteLine($"<li id=\"fn:{footnote.Order}\">");
                 renderer.WriteChildren(footnote);
-                renderer.WriteLine("</li>");
             }
 
-            renderer.WriteLine("</ol>");
             renderer.WriteLine("</div>");
         }
     }

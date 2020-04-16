@@ -36,7 +36,7 @@ namespace BookBuilder.Pipeline
                         .UseSyntaxHighlighting()
                         .UseSidenotes()
                         .UseMarkdownLocalLinksPatchingExtension(ProcessingOptions)
-                        .UsePodcastFrameSupport(new PodcastSupportOptions{Width = "400px", Height = "102px"})
+                        .UsePodcastFrameSupport(new PodcastSupportOptions{Width = "400px", Height = "102px", Class = "music-player"})
                         .Build());
 
             ProjectProcessing.TryAddTask(new MarkdownParsingProcessor(newContext));
