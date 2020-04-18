@@ -1,4 +1,5 @@
 using BookBuilder.Extensions.Footnotes;
+using BookBuilder.GenericAttributes.Extensions;
 using Markdig;
 
 namespace BookBuilder.Extensions
@@ -22,6 +23,12 @@ namespace BookBuilder.Extensions
         public static MarkdownPipelineBuilder UseSidenotes(this MarkdownPipelineBuilder builder)
         {
             builder.Extensions.AddIfNotAlready(new SidenoteExtension());
+            return builder;
+        }
+
+        public static MarkdownPipelineBuilder UseExtendedGenericAttributes(this MarkdownPipelineBuilder builder)
+        {
+            builder.Extensions.AddIfNotAlready(new GenericExAttributesExtension());
             return builder;
         }
     }

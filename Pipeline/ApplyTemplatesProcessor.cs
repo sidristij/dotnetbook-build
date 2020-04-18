@@ -31,7 +31,7 @@ namespace BookBuilder.Pipeline
             var document = Template ?? DocumentBody;
             var changed = false;
             var templatesProcessor = new AggregateTemplateProcessor(Context);
-        
+
             do
             {
                 var oldDocument = document;
@@ -39,8 +39,10 @@ namespace BookBuilder.Pipeline
                 changed = oldDocument != document;
             } while (!changed);
 
-            await using var writer = new StreamWriter(ProcessingOptions.TargetPath, false, Encoding.UTF8);
-            writer.Write(document);
+            using (var writer = new StreamWriter(ProcessingOptions.TargetPath, false, Encoding.UTF8) {AutoFlush = true})
+            {
+                writer.Write(document);
+            }
         }
     }
 }

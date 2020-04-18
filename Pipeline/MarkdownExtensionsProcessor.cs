@@ -32,6 +32,7 @@ namespace BookBuilder.Pipeline
                     .With(pipelineBuilder)
                     .With(pipelineBuilder
                         .UseAdvancedExtensions()
+                        .UseExtendedGenericAttributes()
                         .UseSmartyPants(smartyOptions)
                         .UseSyntaxHighlighting()
                         .UseSidenotes()
