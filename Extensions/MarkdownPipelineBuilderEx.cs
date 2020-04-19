@@ -1,4 +1,5 @@
 using BookBuilder.Extensions.Footnotes;
+using BookBuilder.Extensions.ParagraphNumbers;
 using BookBuilder.GenericAttributes.Extensions;
 using Markdig;
 
@@ -22,13 +23,19 @@ namespace BookBuilder.Extensions
 
         public static MarkdownPipelineBuilder UseSidenotes(this MarkdownPipelineBuilder builder)
         {
-            builder.Extensions.AddIfNotAlready(new SidenoteExtension());
+            builder.Extensions.AddIfNotAlready<SidenoteExtension>();
             return builder;
         }
 
         public static MarkdownPipelineBuilder UseExtendedGenericAttributes(this MarkdownPipelineBuilder builder)
         {
-            builder.Extensions.AddIfNotAlready(new GenericExAttributesExtension());
+            builder.Extensions.AddIfNotAlready<GenericExAttributesExtension>();
+            return builder;
+        }
+
+        public static MarkdownPipelineBuilder UseParagraphsNumbering(this MarkdownPipelineBuilder builder)
+        {
+            builder.Extensions.AddIfNotAlready<ParagraphNumbersExtension>();
             return builder;
         }
     }
