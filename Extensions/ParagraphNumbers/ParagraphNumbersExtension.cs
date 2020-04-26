@@ -24,15 +24,18 @@ namespace BookBuilder.Extensions.ParagraphNumbers
             
             foreach (var paragraph in paragraphs)
             {
-                var container = new ParagraphNumbersBlock(new CustomContainerParser())
+                if (paragraph.Span.Length > 80)
                 {
-                    ParagraphIndex = paragraphIndex++
-                };
-                var index = document.IndexOf(paragraph);
-                document.RemoveAt(index);
-                document.Insert(index, container);
-                
-                container.Insert(0, paragraph);
+                    var container = new ParagraphNumbersBlock(new CustomContainerParser())
+                    {
+                        ParagraphIndex = paragraphIndex++
+                    };
+                    var index = document.IndexOf(paragraph);
+                    document.RemoveAt(index);
+                    document.Insert(index, container);
+                    
+                    container.Insert(0, paragraph);
+                }
             }
         }
 
