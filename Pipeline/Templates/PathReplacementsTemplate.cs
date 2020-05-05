@@ -15,7 +15,7 @@ namespace BookBuilder.Pipeline.Templates
         {
             _resourcesPaths = new Dictionary<string, string>
             {
-                {"{RES_SOURCE_PATH}", ProcessingOptions.Resources},
+                {"{RES_SOURCE_PATH}", ProcessingOptions.ResourcesSource},
                 {"{RES_PATH}", Path.Combine(PathHelper.MakeRelativePath(ProcessingOptions.TargetPath, ProcessingOptions.TargetRootPath), @"res")},
                 {"{SOURCE_PATH}", ProcessingOptions.SourcePath},
                 {"{TARGET_PATH}", @".\"},

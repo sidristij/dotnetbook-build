@@ -17,7 +17,7 @@ namespace BookBuilder.Pipeline.Templates
         {
             if (TryFindArea(incoming, "<!--clone-from:", "-->", out var fileRelativePath, out var region))
             {
-                var resourcesSourcePath = Path.Combine(ProcessingOptions.Resources, fileRelativePath);
+                var resourcesSourcePath = Path.Combine(ProcessingOptions.ResourcesSource, fileRelativePath);
                 try
                 {
                     var contents = File.ReadAllText(resourcesSourcePath);
