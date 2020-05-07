@@ -1,4 +1,5 @@
 using BookBuilder.Extensions.Footnotes;
+using BookBuilder.Extensions.Hyphen;
 using BookBuilder.Extensions.ParagraphNumbers;
 using BookBuilder.GenericAttributes.Extensions;
 using Markdig;
@@ -36,6 +37,12 @@ namespace BookBuilder.Extensions
         public static MarkdownPipelineBuilder UseParagraphsNumbering(this MarkdownPipelineBuilder builder)
         {
             builder.Extensions.AddIfNotAlready<ParagraphNumbersExtension>();
+            return builder;
+        }
+
+        public static MarkdownPipelineBuilder UseSplitWithHyphens(this MarkdownPipelineBuilder builder)
+        {
+            builder.Extensions.AddIfNotAlready<HyphensCheckerExtension>();
             return builder;
         }
     }
