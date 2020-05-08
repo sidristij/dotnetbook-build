@@ -91,7 +91,10 @@ namespace BookBuilder.Extensions.Hyphen
                         }
                     }
                 }
-
+                else
+                {
+                    renderer.Write(leaf);
+                }
                 leaf = leaf.NextSibling;
             }
             renderer.WriteLine("</p>");
