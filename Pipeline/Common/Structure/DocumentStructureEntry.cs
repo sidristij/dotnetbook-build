@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using BookBuilder.Helpers;
 using Markdig.Syntax;
 
 namespace BookBuilder.Pipeline.Common.Structure
 {
+    [DebuggerDisplay("Title: {Title}, Depth: {Depth}")]
     internal class DocumentStructureEntry
     {
         private ConcurrentBag<DocumentStructureEntry> _subentries;
-        private string title;
         private int depth;
 
         public DocumentStructureEntry(FileDescription source, MarkdownDocument document, HeadingBlock block, int depth = 0, DocumentStructureEntry parent = null)
@@ -26,23 +28,11 @@ namespace BookBuilder.Pipeline.Common.Structure
             _subentries.Add(entry);
         }
 
-        public DocumentStructureEntry WithTitle(string title)
-        {
-            this.title = title;
-            return this;
-        }
-
-        public DocumentStructureEntry WithDepth(int depth)
-        {
-            this.depth = depth;
-            return this;
-        }
-
         public FileDescription Source { get; }
 
         public int Depth => depth;
 
-        public ReadOnlySpan<char> Title => Block?.ToPositionText() ?? title;
+        public ReadOnlySpan<char> Title => Block.GetTitle();
 
         public MarkdownDocument Document { get; }
 

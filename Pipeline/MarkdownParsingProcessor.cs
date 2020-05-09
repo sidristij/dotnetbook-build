@@ -36,7 +36,7 @@ namespace BookBuilder.Pipeline
                 .With(document)
                 .With(documentStructure);
 
-            VisitDocument(document, documentStructure);
+            VisitDocument(document, documentStructure); // depth = 0
             
             ProjectProcessing.TryAddTask(new MarkdownDocumentProcessor(ctx));
         }
@@ -51,50 +51,45 @@ namespace BookBuilder.Pipeline
 
         private void VisitMarkdownObject(MarkdownDocument document, MarkdownObject markdownObject, ref DocumentStructureEntry entry)
         {
-            switch (markdownObject)
+            if (markdownObject is HeadingBlock header)
             {
-                case HeadingBlock header when entry.Depth > header.Level - 1:
+                // Console.WriteLine("{0}: # {1} {2}", document.GetHashCode(), blk.Level, blk.GetTitle().ToString());
+
+                // Если найден более глубокий, что есть у нас, добавить к себе 
+                if (header.Level > entry.Depth)
                 {
                     var parent = entry;
                     entry = new DocumentStructureEntry(FileDescription, document, header, header.Level, entry);
                     parent.AddChild(entry);
-                    break;
                 }
-
-                case HeadingBlock header when entry.Depth <= header.Level:
+                else if (header.Level <= entry.Depth)
                 {
                     var cur = entry;
-                    while (cur.Depth > header.Level) cur = cur.Parent;
-                    if (cur.Depth >= header.Level) cur = cur.Parent;
+                    while (cur.Depth >= header.Level) cur = cur.Parent;
                     entry = new DocumentStructureEntry(FileDescription, document, header, header.Level, cur);
                     cur.AddChild(entry);
-                    break;
                 }
-
-                case Table table:
-                    var rows = table
-                        .Descendants().OfType<TableRow>()
-                        .Select((row, rowIndex) =>
-                        (
-                            row.Descendants()
-                                .OfType<TableCell>()
-                                .Select((cell, colIndex) => (cellLength: cell.CalculateTextLength(), colIndex))
-                                .ToList(),
-                            rowIndex
-                        )).ToList();
-                    
-                    var tableParameters = GetTableParameters(table, rows);
-                    var tableProps = tableParameters.GetLayoutInfo();
-
-                    table
-                        .WrapWith(document, "offset-" + tableProps.Offset, "col-" + tableProps.Width)
-                        .WrapWith(document,"row");
-                    break;
             }
-
-            foreach (var descendant in markdownObject.Descendants())
+            
+            if (markdownObject is Table table)
             {
-                VisitMarkdownObject(document, descendant, ref entry);
+                var rows = table
+                    .Descendants().OfType<TableRow>()
+                    .Select((row, rowIndex) =>
+                    (
+                        row.Descendants()
+                            .OfType<TableCell>()
+                            .Select((cell, colIndex) => (cellLength: cell.CalculateTextLength(), colIndex))
+                            .ToList(),
+                        rowIndex
+                    )).ToList();
+                
+                var tableParameters = GetTableParameters(table, rows);
+                var tableProps = tableParameters.GetLayoutInfo();
+
+                table
+                    .WrapWith(document, "offset-" + tableProps.Offset, "col-" + tableProps.Width)
+                    .WrapWith(document,"row");
             }
         }
 

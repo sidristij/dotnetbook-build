@@ -17,7 +17,8 @@ namespace BookBuilder.Pipeline.Templates
                 new DocumentBodyTemplate(context),
                 new PathReplacementsTemplate(context),
                 new LinkToTemplate(context),
-                new CloneFromTemplate(context)
+                new CloneFromTemplate(context),
+                new DocumentStructureTemplate(context)
             };
         }
 
