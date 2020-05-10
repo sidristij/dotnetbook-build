@@ -24,7 +24,7 @@ namespace BookBuilder.Pipeline.Templates
                 var sb = new StringBuilder();
                 foreach (var subEntry in structure.SubEntries.SelectMany(x => x.SubEntries).Reverse())
                 {
-                    sb.AppendLine($"<li><a href=\"#{subEntry.Block.GetAttributes().Id}\">");
+                    sb.AppendLine($"<li><a href=\"#{subEntry.Block.GetAttributes().Id}\" onclick=\"$('#menu__toggle').click(); return true;\">");
                     sb.Append(subEntry.Title);
                     sb.AppendLine("</a></li>");
                 }
