@@ -61,23 +61,27 @@ namespace BookBuilder.Extensions.Hyphen
                     {
                         while (index < text.Length)
                         {
-                            if (text[index].IsRussian())
+                            if (text[index].IsSupportedLanguage())
                             {
-                                var ruStart = index;
+                                var start = index;
                                 
-                                while (index < text.Length && text[index].IsRussian())
+                                while (index < text.Length && text[index].IsLanguageEqual(text[start]))
                                     index++;
 
-                                var ruword = text.Slice(ruStart, index - ruStart);
+                                var word = text.Slice(start, index - start);
 
-                                if (ruword.Length > 3)
+                                if (word.Length > 3)
                                 {
-                                    var spliced = HyphensChecker.SplitWithHyphens(ruword);
-                                    renderer.Write(spliced.Replace("-", "&shy;"));
+                                    var spliced = HyphensChecker.SplitWithHyphens(word);
+                                    if (spliced == word)
+                                        renderer.Write(spliced.ToString());
+                                    else
+                                        renderer.Write(spliced.ToString().Replace("-", "&shy;"));
+                                    
                                 }
                                 else
                                 {
-                                    var slice = new StringSlice(content.Text, content.Start + ruStart,
+                                    var slice = new StringSlice(content.Text, content.Start + start,
                                         content.Start + index - 1);
                                     
                                     renderer.Write(slice);

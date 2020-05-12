@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Markdig.Helpers;
 
 // ReSharper disable StringLiteralTypo
 
@@ -7,95 +8,126 @@ namespace BookBuilder.Extensions.Hyphen
 {
     public ref struct HyphensChecker
     {
-        private ReadOnlySpan<char> _src;
-        private bool _solved;
-        private int _hyphenPosition;
-        
-        public static string SplitWithHyphens(ReadOnlySpan<char> str)
+        private static string[] russianTemplates = {
+            "вест-ный", "крос-сплат", "след-стви", "рам-мно", "арен-до", 
+            "биб-ли",   "о-те",       "объ-ем",    "обя-за",  "тель-но", 
+            "рост-но",  "вос-тре",    "про-из",    "чест-во", "клас-со", 
+            "при-клю",  "пир-клю",    "вспом-ни",  "вклю-ча", "ко-прои", 
+            "мож-но",   "взя-ла",     "по-ться",   "по-тся",  "разъ-езд", 
+            "ап-ри",    "ас-тро",     "ки-но",     "нош-па",  "па-ет", 
+            "т-во"
+        };
+
+        public static ReadOnlySpan<char> SplitWithHyphens(ReadOnlySpan<char> str)
         {
             var word = str;
-            Span<int> positions = stackalloc int[str.Length/2];
-            var lastPosition = 0;
-            
+            Span<int> positions = stackalloc int[str.Length >> 1];
+            var positionsCount = 0;
+
             do
             {
-                var hyphensChecker = HyphensChecker.From(word)
-                    .Check("вест-ный")
-                    .Check("крос-сплат")
-                    .Check("след-стви")
-                	.Check("рам-мно")
-                    .Check("арен-до")
-                    .Check("биб-ли")
-                    .Check("о-те")
-                    .Check("объ-ем")
-                    .Check("обя-за")
-                    .Check("тель-но")
-                    .Check("рост-но")
-                    .Check("вос-тре")
-                    .Check("про-из")
-                    .Check("чест-во")
-                    .Check("клас-со")
-                    .Check("при-клю")
-                    .Check("пир-клю")
-                    .Check("вспом-ни")
-                    .Check("вклю-ча")
-                    .Check("ко-прои")
-                    .Check("мож-но")
-                    .Check("взя-ла")
-                    .Check("по-ться")
-                    .Check("по-тся")
-                    .Check("разъ-езд")
-                    .Check("ап-ри")
-                    .Check("ас-тро")
-                    .Check("ки-но")
-                    .Check("нош-па")
-                    .Check("па-ет")
-                    .Check("т-во")
-                    ;
-			
-                if(hyphensChecker._solved)
+                var hyphensChecker = HyphensChecker.TryGetRussianHypenPosition(word);
+                if(hyphensChecker.HasValue)
                 {
-                    word = word.Slice(hyphensChecker._hyphenPosition);
-                    var prev = lastPosition == 0 ? 0 : positions[lastPosition-1];
-                    positions[lastPosition++] = prev + hyphensChecker._hyphenPosition;
+                    word = word.Slice((int)hyphensChecker);
+                    var prev = positionsCount == 0 ? 0 : positions[positionsCount-1];
+                    positions[positionsCount++] = prev + (int)hyphensChecker;
                 } else {
                     word = word.Slice(1);
                 }
             } while (word.Length > 3);
-	
-            var builder = new StringBuilder();
 
-            if (positions[0] < 2) { positions = positions.Slice(1); lastPosition--; }
-	
+            if (positionsCount == 0) 
+                return str;
+
+            var trailLength = word[0].IsRussian() ? 2 : 3;
+            var builder = new StringBuilder();
+            if (positions[0] <= trailLength)
+            {
+                positions = positions.Slice(1);
+                positionsCount--;
+            }
+
+            if (positionsCount == 0) 
+                return str;
+
+            if ((str.Length - positions[positionsCount - 1]) <= trailLength)
+            {
+                positionsCount--;
+                positions = positions.Slice(0, positionsCount);
+            }
+            
+            if (positionsCount == 0) 
+                return str;
+            
             var lastIndex = 0;
-            for (var i = 0; i < lastPosition; i++)
+            for (var i = 0; i < positionsCount; i++)
             {
                 var charsToWrite = positions[i] - lastIndex;
                 builder.Append(str.Slice(lastIndex, charsToWrite));
                 builder.Append('-');
                 lastIndex += charsToWrite;
             }
-	
+
             builder.Append(str.Slice(lastIndex, str.Length - lastIndex));
             return builder.ToString();
         }
 
-        private static HyphensChecker From(ReadOnlySpan<char> span)
+        // private static ReadOnlySpan<char> TryFindEnglishHypenPosition(ReadOnlySpan<char> incoming)
+        // {
+        //     // check for Upper-Case-English-Version
+        //     var start = 0;
+        //     if (incoming[start].IsAlphaUpper())
+        //     {
+        //         for (var i = 1; i < incoming.Length; i++)
+        //         {
+        //             if (!incoming[i].IsAlpha())
+        //             {
+        //                 break;
+        //             }
+        //             if (!incoming[i].IsAlphaUpper())
+        //             {
+        //                 continue;
+        //             }
+        //             
+        //             if (i > start + 1)
+        //             {
+        //                 return i;
+        //             }
+        //             
+        //             start = i;
+        //         }
+        //     }
+        // }
+
+        private static int? TryGetRussianHypenPosition(ReadOnlySpan<char> span)
         {
-            return new HyphensChecker { _src = span };
+            // nothing to check
+            if (span.Length == 0) return null;
+
+            // check for russian
+            foreach (var tmpl in russianTemplates)
+            {
+                if (TryFindHypenTemplate(tmpl, span, out var hyphenPosition))
+                {
+                    return hyphenPosition;
+                }
+            }
+
+            return null;
         }
 
-        private HyphensChecker Check(string tmpl)
+        private static bool TryFindHypenTemplate(ReadOnlySpan<char> tmplChars, ReadOnlySpan<char> src, out int hyphenPosition)
         {
-            if (_solved) return this;
-            ReadOnlySpan<char> tmplChars = tmpl;
-            Span<char> template = stackalloc char[tmplChars.Length-1];  // minus hyphen
-            _hyphenPosition=-1;
+            Span<char> template = stackalloc char[tmplChars.Length - 1]; // minus hyphen
+
+            hyphenPosition = -1;
+
             for (int i = 0, j = 0; i < tmplChars.Length; i++)
             {
                 if (tmplChars[i] == '-')
                 {
-                    _hyphenPosition = i;
+                    hyphenPosition = i;
                 }
                 else
                 {
@@ -106,17 +138,20 @@ namespace BookBuilder.Extensions.Hyphen
 
             for (int i = 0; i < template.Length; i++)
             {
-                if (i == _src.Length) return this;
-			
-                if ((template[i].IsVowel() != _src[i].IsVowel()) ||
-                    (template[i].IsNoSound() != _src[i].IsNoSound()) ||
-                    (template[i].IsConsonant() != _src[i].IsConsonant()))
-                    return this;
+                if (i == src.Length)
+                {
+                    return false;
+                }
+
+                if ((template[i].IsVowel() != src[i].IsVowel()) ||
+                    (template[i].IsNoSound() != src[i].IsNoSound()) ||
+                    (template[i].IsConsonant() != src[i].IsConsonant()))
+                {
+                    return false;
+                }
             }
 
-            _solved = _hyphenPosition > 0;
-		
-            return this;
+            return true;
         }
     }
 }
