@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using Markdig.Helpers;
 
 // ReSharper disable StringLiteralTypo
 
@@ -17,7 +16,7 @@ namespace BookBuilder.Extensions.Hyphen
             "ап-ри",    "ас-тро",     "ки-но",     "нош-па",  "па-ет", 
             "т-во"
         };
-
+        
         public static ReadOnlySpan<char> SplitWithHyphens(ReadOnlySpan<char> str)
         {
             var word = str;
@@ -26,7 +25,7 @@ namespace BookBuilder.Extensions.Hyphen
 
             do
             {
-                var hyphensChecker = HyphensChecker.TryGetRussianHypenPosition(word);
+                var hyphensChecker = TryGetRussianHypenPosition(word);
                 if(hyphensChecker.HasValue)
                 {
                     word = word.Slice((int)hyphensChecker);
@@ -72,34 +71,7 @@ namespace BookBuilder.Extensions.Hyphen
             builder.Append(str.Slice(lastIndex, str.Length - lastIndex));
             return builder.ToString();
         }
-
-        // private static ReadOnlySpan<char> TryFindEnglishHypenPosition(ReadOnlySpan<char> incoming)
-        // {
-        //     // check for Upper-Case-English-Version
-        //     var start = 0;
-        //     if (incoming[start].IsAlphaUpper())
-        //     {
-        //         for (var i = 1; i < incoming.Length; i++)
-        //         {
-        //             if (!incoming[i].IsAlpha())
-        //             {
-        //                 break;
-        //             }
-        //             if (!incoming[i].IsAlphaUpper())
-        //             {
-        //                 continue;
-        //             }
-        //             
-        //             if (i > start + 1)
-        //             {
-        //                 return i;
-        //             }
-        //             
-        //             start = i;
-        //         }
-        //     }
-        // }
-
+        
         private static int? TryGetRussianHypenPosition(ReadOnlySpan<char> span)
         {
             // nothing to check

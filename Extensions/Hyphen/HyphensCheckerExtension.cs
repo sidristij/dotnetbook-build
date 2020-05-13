@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Markdig;
 using Markdig.Helpers;
 using Markdig.Renderers;
@@ -25,7 +26,7 @@ namespace BookBuilder.Extensions.Hyphen
     }
 
     public class ParagraphWithHyphensRenderer : HtmlObjectRenderer<ParagraphBlock>
-    {
+    {        
         protected override void Write(HtmlRenderer renderer, ParagraphBlock obj)
         {
             renderer.EnsureLine();
@@ -48,6 +49,8 @@ namespace BookBuilder.Extensions.Hyphen
             renderer.Write("<p ");
             renderer.Write(inline.GetAttributes());
             renderer.WriteLine(">");
+            Span<int> posBuffer = stackalloc int[20];
+            
 
             while (leaf != null)
             {
@@ -61,6 +64,54 @@ namespace BookBuilder.Extensions.Hyphen
                     {
                         while (index < text.Length)
                         {
+                            // check UpperCase
+                            if (text[index].IsAlphaUpper())
+                            {
+                                var lastIndex = index + 1;
+                                var upperCount = 0;
+                                var lowerCount = 0;
+                                for (; lastIndex < text.Length && text[lastIndex].IsAlpha(); lastIndex++)
+                                {
+                                    if (!text[lastIndex].IsAlphaUpper())
+                                    {
+                                        lowerCount++;
+                                        continue;
+                                    }
+                                    
+                                    // -1: prev symbol, not capital
+                                    if (lowerCount > 0)
+                                    {
+                                        posBuffer[upperCount] = lastIndex - index - 1;
+                                        upperCount++;
+                                    }
+                                    lowerCount = 0;
+                                }
+
+                                if (upperCount > 0)
+                                {
+                                    var word = text.Slice(index, lastIndex - index);
+                                    var positions = posBuffer.Slice(0, upperCount);
+                                    if (word.Length > 2)
+                                    {
+                                        var sb = new StringBuilder(word.Length + upperCount);
+                                        var lastPos = 0;
+                                        for (int pos = 0; pos < positions.Length; pos++)
+                                        {
+                                            sb.Append(word.Slice(lastPos, positions[pos] - lastPos + 1));
+                                            if (pos != posBuffer.Length - 1)
+                                                sb.Append("&shy;");
+                                            lastPos = positions[pos] + 1;
+                                        }
+
+                                        sb.Append(word.Slice(lastPos));
+                                        renderer.Write(sb.ToString());
+                                        index = index + word.Length;
+                                        continue;
+                                    }
+                                }
+                            }
+                            
+                            // Check language-specific hyphens
                             if (text[index].IsSupportedLanguage())
                             {
                                 var start = index;
@@ -73,11 +124,9 @@ namespace BookBuilder.Extensions.Hyphen
                                 if (word.Length > 3)
                                 {
                                     var spliced = HyphensChecker.SplitWithHyphens(word);
-                                    if (spliced == word)
-                                        renderer.Write(spliced.ToString());
-                                    else
-                                        renderer.Write(spliced.ToString().Replace("-", "&shy;"));
-                                    
+                                    renderer.Write(spliced == word
+                                        ? spliced.ToString()
+                                        : spliced.ToString().Replace("-", "&shy;"));
                                 }
                                 else
                                 {
