@@ -21,7 +21,7 @@ namespace BookBuilder.Extensions.Hyphen
             "т-во"
         };
         
-        public static void RenderWithHyphens(this HtmlRenderer renderer, LeafInline inlineText)
+        public static void WriteWithHyphens(this HtmlRenderer renderer, LeafInline inlineText)
         {
             var index = 0;
             ReadOnlySpan<char> text = null;
@@ -41,9 +41,12 @@ namespace BookBuilder.Extensions.Hyphen
                         var lastIndex = index + 1;
                         var upperCount = 0;
                         var lowerCount = 0;
-                        for (; lastIndex < text.Length && text[lastIndex].IsAlpha(); lastIndex++)
+                        for ( ; 
+                            lastIndex < text.Length && (text[lastIndex].IsAlpha() || text[lastIndex].IsAsciiPunctuation()); 
+                            lastIndex++)
                         {
-                            if (!text[lastIndex].IsAlphaUpper())
+                            var ch = text[lastIndex];
+                            if (ch.IsAlpha() && !ch.IsAlphaUpper())
                             {
                                 lowerCount++;
                                 continue;
