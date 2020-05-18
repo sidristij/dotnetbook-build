@@ -1,6 +1,6 @@
 ﻿using Markdig.Syntax;
 
-namespace BookBuilder.Extensions.Footnotes
+namespace BookBuilder.Extensions.Sidenotes
 {
     public class SidenoteLinkReferenceDefinition : LinkReferenceDefinition
     {

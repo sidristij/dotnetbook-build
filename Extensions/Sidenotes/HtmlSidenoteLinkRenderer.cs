@@ -1,8 +1,7 @@
 ﻿using Markdig.Renderers;
 using Markdig.Renderers.Html;
-using Markdig.Syntax.Inlines;
 
-namespace BookBuilder.Extensions.Footnotes
+namespace BookBuilder.Extensions.Sidenotes
 {
     public class HtmlSidenoteLinkRenderer : HtmlObjectRenderer<SidenoteLink>
     {

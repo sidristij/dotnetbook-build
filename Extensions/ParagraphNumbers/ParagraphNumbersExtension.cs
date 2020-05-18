@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using BookBuilder.Extensions.Footnotes;
+using BookBuilder.Extensions.Sidenotes;
 using Markdig;
 using Markdig.Extensions.CustomContainers;
 using Markdig.Renderers;

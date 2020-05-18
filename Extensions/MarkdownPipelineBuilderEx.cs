@@ -1,6 +1,7 @@
-using BookBuilder.Extensions.Footnotes;
 using BookBuilder.Extensions.Hyphen;
+using BookBuilder.Extensions.ImageContainer;
 using BookBuilder.Extensions.ParagraphNumbers;
+using BookBuilder.Extensions.Sidenotes;
 using BookBuilder.GenericAttributes.Extensions;
 using Markdig;
 
@@ -43,6 +44,12 @@ namespace BookBuilder.Extensions
         public static MarkdownPipelineBuilder UseSplitWithHyphens(this MarkdownPipelineBuilder builder)
         {
             builder.Extensions.AddIfNotAlready<HyphensCheckerExtension>();
+            return builder;
+        }
+
+        public static MarkdownPipelineBuilder UseImageContainers(this MarkdownPipelineBuilder builder)
+        {
+            builder.Extensions.AddIfNotAlready<ImageContainerExtension>();
             return builder;
         }
     }

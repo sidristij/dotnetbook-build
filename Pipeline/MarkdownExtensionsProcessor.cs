@@ -38,6 +38,7 @@ namespace BookBuilder.Pipeline
                         .UseSidenotes()
                         .UseSplitWithHyphens()
                         .UseParagraphsNumbering()
+                        .UseImageContainers()
                         .UseMarkdownLocalLinksPatchingExtension(ProcessingOptions)
                         .UsePodcastFrameSupport(new PodcastSupportOptions{Width = "400px", Height = "102px", Class = "music-player"})
                         .Build());

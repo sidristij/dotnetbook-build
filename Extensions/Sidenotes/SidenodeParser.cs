@@ -4,7 +4,7 @@ using Markdig.Parsers;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
-namespace BookBuilder.Extensions.Footnotes
+namespace BookBuilder.Extensions.Sidenotes
 {
         /// <summary>
     /// The block parser for a <see cref="Sidenote"/>.

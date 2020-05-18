@@ -1,6 +1,6 @@
 ﻿using Markdig.Syntax.Inlines;
 
-namespace BookBuilder.Extensions.Footnotes
+namespace BookBuilder.Extensions.Sidenotes
 {
     public class SidenoteLink : Inline
     {

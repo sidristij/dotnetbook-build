@@ -1,7 +1,7 @@
 ﻿using Markdig;
 using Markdig.Renderers;
 
-namespace BookBuilder.Extensions.Footnotes
+namespace BookBuilder.Extensions.Sidenotes
 {
     public class SidenoteExtension : IMarkdownExtension
     {

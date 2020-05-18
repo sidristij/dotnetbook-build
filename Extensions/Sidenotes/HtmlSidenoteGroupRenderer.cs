@@ -2,7 +2,7 @@
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
 
-namespace BookBuilder.Extensions.Footnotes
+namespace BookBuilder.Extensions.Sidenotes
 {
     public class HtmlSidenoteGroupRenderer : HtmlObjectRenderer<SidenoteGroup>
     {
