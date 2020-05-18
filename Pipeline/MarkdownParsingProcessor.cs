@@ -85,20 +85,21 @@ namespace BookBuilder.Pipeline
                     )).ToList();
                 
                 var tableParameters = GetTableParameters(table, rows);
-                var tableProps = tableParameters.GetLayoutInfo();
+                var width = tableParameters.GetLayoutInfo();
 
                 table
-                    .WrapWith(document, "offset-" + tableProps.Offset, "col-" + tableProps.Width)
-                    .WrapWith(document,"row");
+                    .WrapWith(document, "table-width-" + width, "table-cols-" + table.ColumnDefinitions.Count)
+                    .WrapWith(document,"table-container");
             }
         }
 
         private static TableParameters GetTableParameters(Table table,
             IReadOnlyCollection<(List<(int cellLength, int colIndex)> columns, int rowIndex)> rows)
         {
-            var map = rows.First().columns.ToDictionary(o => o.colIndex, o => o.cellLength);
+            var map = rows.First()
+                .columns.ToDictionary(o => o.colIndex, o => o.cellLength);
 
-            rows.Skip(1)
+            var widths = rows.Skip(1)
                 .Aggregate(
                     map,
                     (agr, nextItem) =>
@@ -109,31 +110,39 @@ namespace BookBuilder.Pipeline
                                 agr[i] = nextItem.columns[i].cellLength;
                         }
                         return agr;
-                    });
-            return new TableParameters(table, map);
+                    })
+                .ToList()
+                .OrderBy(x => x.Key)
+                .Select(x => x.Value)
+                .ToList();
+            
+            return new TableParameters(table, widths);
         }
     }
 
     internal class TableParameters
     {
         private readonly Table _table;
-        private readonly Dictionary<int, int> _cellsInfo;
+        private readonly List<int> _cellsInfo;
+        private readonly List<int> _columnRatios;
 
-        private List<(int MaxLength, int Size, int Skip, int Columns)> _tableSizes = new List<(int, int, int, int)>
+        private List<(int MaxLength, int Size, int Columns)> _tableSizes = new List<(int, int, int)>
         {
-            // symbols, width, offset, max columns count
-            (0,         8,     4,      3),
-            (12,        6,     3,      4),
-            (128,       8,     2,      8),
-            (256,       10,    1,      10),
-            (384,       12,    0,      100)
+            // symbols, width, max columns count
+            (0,         8,     3),
+            (12,        6,     4),
+            (128,       8,     8),
+            (256,       10,    10),
+            (384,       12,    100)
         };
 
-        public TableParameters(Table table, Dictionary<int, int> cellsInfo)
+        public TableParameters(Table table, List<int> cellsInfo)
         {
             _table = table;
             _cellsInfo = cellsInfo;
-            TotalLength = _cellsInfo.Sum(x => x.Value);
+            TotalLength = _cellsInfo.Sum();
+            // var minValue = _cellsInfo.Max(x => x.Value, )
+            // _columnRatios = 
         }
 
         public int ColumnsCount => _table.ColumnDefinitions.Count;
@@ -142,7 +151,7 @@ namespace BookBuilder.Pipeline
 
         public int GetColumnMaxLength(int columnIndex) => _cellsInfo[columnIndex];
 
-        public (int Offset, int Width) GetLayoutInfo()
+        public int GetLayoutInfo()
         {
             var allowed = _tableSizes
                 .Select((val, index) =>
@@ -161,8 +170,8 @@ namespace BookBuilder.Pipeline
                 Enumerable.Range(allowedByLength, _tableSizes.Count - allowedByLength)
                 .First(x => allowed[x].byCol);
 
-            var (_, size, skip, _) = _tableSizes[allowed[allowedByColsCount].index];
-            return (skip, size);
+            var (_, size, _) = _tableSizes[allowed[allowedByColsCount].index];
+            return size;
         }
     }
 }
