@@ -11,7 +11,7 @@ namespace BookBuilder.Extensions.Hyphen
 {
     public static class HyphensChecker
     {
-        private static string[] russianTemplates = {
+        private static string[] templates = {
             "вест-ный", "крос-сплат", "след-стви", "рам-мно", "арен-до", 
             "биб-ли",   "о-те",       "объ-ем",    "обя-за",  "тель-но", 
             "рост-но",  "вос-тре",    "про-из",    "чест-во", "клас-со", 
@@ -29,8 +29,9 @@ namespace BookBuilder.Extensions.Hyphen
             if(inlineText is LiteralInline literalInline) text = literalInline.Content.AsSpan();
             if(inlineText is CodeInline codeInline) text = codeInline.Content;
             
-            Span<int> posBuffer = stackalloc int[20];
+            if(text == null) return;
 
+            Span<int> posBuffer = stackalloc int[20];
             while (index < text.Length)
             {
                 while (index < text.Length)
@@ -87,7 +88,7 @@ namespace BookBuilder.Extensions.Hyphen
                     }
 
                     // Check language-specific hyphens
-                    if (text[index].IsSupportedLanguage())
+                    else if (text[index].IsSupportedLanguage())
                     {
                         var start = index;
 
@@ -99,9 +100,7 @@ namespace BookBuilder.Extensions.Hyphen
                         if (word.Length > 3)
                         {
                             var spliced = HyphensChecker.SplitWithHyphens(word);
-                            renderer.Write(spliced == word
-                                ? spliced.ToString()
-                                : spliced.ToString().Replace("-", "&shy;"));
+                            renderer.Write(spliced.ToString());
                         }
                         else
                         {
@@ -109,6 +108,11 @@ namespace BookBuilder.Extensions.Hyphen
                             renderer.Write(slice);
                         }
 
+                        continue;
+                    } else if (text[index] == ' ') // for customizable spaces btw words
+                    {
+                        renderer.Write("<span class=\"spacer\"> </span>");
+                        index++;
                         continue;
                     }
 
@@ -166,7 +170,7 @@ namespace BookBuilder.Extensions.Hyphen
             {
                 var charsToWrite = positions[i] - lastIndex;
                 builder.Append(str.Slice(lastIndex, charsToWrite));
-                builder.Append('-');
+                builder.Append("&shy;");
                 lastIndex += charsToWrite;
             }
 
@@ -180,7 +184,7 @@ namespace BookBuilder.Extensions.Hyphen
             if (span.Length == 0) return null;
 
             // check for russian
-            foreach (var tmpl in russianTemplates)
+            foreach (var tmpl in templates)
             {
                 if (TryFindHypenTemplate(tmpl, span, out var hyphenPosition))
                 {
