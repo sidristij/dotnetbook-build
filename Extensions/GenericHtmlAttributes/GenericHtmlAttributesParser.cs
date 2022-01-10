@@ -8,16 +8,17 @@ using Markdig.Syntax.Inlines;
 
 namespace BookBuilder.GenericAttributes.Extensions
 {
-        /// <summary>
+    /// <summary>
     /// An inline parser used to parse a HTML attributes that can be attached to the previous <see cref="Inline"/> or current <see cref="Block"/>.
+    /// {#id/.class/{:|_}attr}
     /// </summary>
     /// <seealso cref="InlineParser" />
-    public class GenericAttributesExtendedParser : InlineParser
+    public class GenericHtmlAttributesParser : InlineParser
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GenericAttributesParser"/> class.
         /// </summary>
-        public GenericAttributesExtendedParser()
+        public GenericHtmlAttributesParser()
         {
             OpeningCharacters = new[] { '{' };
         }
@@ -25,7 +26,8 @@ namespace BookBuilder.GenericAttributes.Extensions
         public override bool Match(InlineProcessor processor, ref StringSlice slice)
         {
             var startPosition = slice.Start;
-            if (TryParse(ref slice, out HtmlAttributes attributes))
+            
+            if (TryParse(ref slice, out var attributes))
             {
                 var inline = processor.Inline;
 
@@ -74,7 +76,7 @@ namespace BookBuilder.GenericAttributes.Extensions
                 attributes.CopyTo(currentHtmlAttributes, true, false);
 
                 // Update the position of the attributes
-                currentHtmlAttributes.Span.Start = processor.GetSourcePosition(startPosition, out int line, out int column);
+                currentHtmlAttributes.Span.Start = processor.GetSourcePosition(startPosition, out var line, out var column);
                 currentHtmlAttributes.Line = line;
                 currentHtmlAttributes.Column = column;
                 currentHtmlAttributes.Span.End = currentHtmlAttributes.Span.Start + slice.Start - startPosition - 1;
@@ -122,8 +124,10 @@ namespace BookBuilder.GenericAttributes.Extensions
                     break;
                 }
 
-                bool isClass = c == '.';
-                if (c == '#' || isClass)
+                var isClass = c == '.';
+                var isId = c == '#';
+                
+                if (isId || isClass)
                 {
                     c = line.NextChar(); // Skip #
                     var start = line.Start;

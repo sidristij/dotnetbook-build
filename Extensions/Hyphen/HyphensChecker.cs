@@ -125,10 +125,11 @@ namespace BookBuilder.Extensions.Hyphen
         
         public static ReadOnlySpan<char> SplitWithHyphens(ReadOnlySpan<char> str)
         {
-            var word = str;
-            Span<int> positions = stackalloc int[str.Length >> 1];
+            ReadOnlySpan<char> word = str;//"оптимизаций".AsSpan();
+            Span<int> positions = stackalloc int[str.Length];
             var positionsCount = 0;
-
+            var trailLength = str[0].IsRussian() ? 2 : 3;
+            
             do
             {
                 var hyphensChecker = TryGetRussianHypenPosition(word);
@@ -140,23 +141,22 @@ namespace BookBuilder.Extensions.Hyphen
                 } else {
                     word = word.Slice(1);
                 }
-            } while (word.Length > 3);
+            } while (word.Length > trailLength);
 
             if (positionsCount == 0) 
                 return str;
 
-            var trailLength = word[0].IsRussian() ? 2 : 3;
             var builder = new StringBuilder();
-            if (positions[0] <= trailLength)
+            while (positions.Length > 0 && positions[0] < trailLength)
             {
                 positions = positions.Slice(1);
                 positionsCount--;
             }
 
-            if (positionsCount == 0) 
+            if (positionsCount <= 0) 
                 return str;
 
-            if ((str.Length - positions[positionsCount - 1]) <= trailLength)
+            if ((positions.Length - positions[positionsCount - 1]) < trailLength)
             {
                 positionsCount--;
                 positions = positions.Slice(0, positionsCount);

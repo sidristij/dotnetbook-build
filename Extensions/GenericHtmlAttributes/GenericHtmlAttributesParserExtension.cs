@@ -3,13 +3,13 @@ using Markdig.Renderers;
 
 namespace BookBuilder.GenericAttributes.Extensions
 {
-    public class GenericExAttributesExtension : IMarkdownExtension
+    public class GenericHtmlAttributesParserExtension : IMarkdownExtension
     {
         public void Setup(MarkdownPipelineBuilder pipeline)
         {
-            if (!pipeline.InlineParsers.Contains<GenericAttributesExtendedParser>())
+            if (!pipeline.InlineParsers.Contains<GenericHtmlAttributesParser>())
             {
-                pipeline.InlineParsers.Insert(0, new GenericAttributesExtendedParser());
+                pipeline.InlineParsers.Insert(0, new GenericHtmlAttributesParser());
             }
         }
 

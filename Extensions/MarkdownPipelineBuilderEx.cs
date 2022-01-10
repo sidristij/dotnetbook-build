@@ -31,7 +31,7 @@ namespace BookBuilder.Extensions
 
         public static MarkdownPipelineBuilder UseExtendedGenericAttributes(this MarkdownPipelineBuilder builder)
         {
-            builder.Extensions.AddIfNotAlready<GenericExAttributesExtension>();
+            builder.Extensions.AddIfNotAlready<GenericHtmlAttributesParserExtension>();
             return builder;
         }
 
