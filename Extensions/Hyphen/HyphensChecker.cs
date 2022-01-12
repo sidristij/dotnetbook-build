@@ -12,11 +12,11 @@ namespace BookBuilder.Extensions.Hyphen
     public static class HyphensChecker
     {
         private static string[] templates = {
-            "вест-ный", "крос-сплат", "след-стви", "рам-мно", "арен-до", 
+            "вест-ный", "крос-сплат", "след-стви", "рам-мно", 
             "биб-ли",   "о-те",       "объ-ем",    "обя-за",  "тель-но", 
             "рост-но",  "вос-тре",    "про-из",    "чест-во", "клас-со", 
             "при-клю",  "пир-клю",    "вспом-ни",  "вклю-ча", "ко-прои", 
-            "мож-но",   "взя-ла",     "по-ться",   "по-тся",  "разъ-езд", 
+            "мож-но",   "взя-ла",     "по-тся",    "раз-езд", 
             "ап-ри",    "ас-тро",     "ки-но",     "нош-па",  "па-ет", 
             "т-во"
         };
@@ -214,16 +214,24 @@ namespace BookBuilder.Extensions.Hyphen
                 }
             }
 
-            for (int i = 0; i < template.Length; i++)
+            for (int i = 0, j = 0; i < template.Length; i++, j++)
             {
+                while (i < src.Length && src[i].IsNoSound())
+                {
+                    if (hyphenPosition == i)
+                    {
+                        hyphenPosition++;
+                    }
+                    i++;
+                }
+
                 if (i == src.Length)
                 {
                     return false;
                 }
 
-                if ((template[i].IsVowel() != src[i].IsVowel()) ||
-                    (template[i].IsNoSound() != src[i].IsNoSound()) ||
-                    (template[i].IsConsonant() != src[i].IsConsonant()))
+                if ((template[j].IsVowel() != src[i].IsVowel()) ||
+                    (template[j].IsConsonant() != src[i].IsConsonant()))
                 {
                     return false;
                 }
