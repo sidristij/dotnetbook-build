@@ -25,10 +25,18 @@ namespace BookBuilder.Extensions.Hyphen
         {
             var index = 0;
             ReadOnlySpan<char> text = null;
+
+            if (inlineText is LiteralInline literalInline)
+            {
+                if (literalInline.Parent is LinkInline { IsImage: true })
+                {
+                    renderer.Write(literalInline.Content);
+                    return;
+                }
+                text = literalInline.Content.AsSpan();
+            }
             
-            if(inlineText is LiteralInline literalInline) text = literalInline.Content.AsSpan();
             if(inlineText is CodeInline codeInline) text = codeInline.Content;
-            
             if(text == null) return;
 
             Span<int> posBuffer = stackalloc int[20];
@@ -81,7 +89,7 @@ namespace BookBuilder.Extensions.Hyphen
 
                                 sb.Append(word.Slice(lastPos));
                                 renderer.Write(sb.ToString());
-                                index = index + word.Length;
+                                index += word.Length;
                                 continue;
                             }
                         }
